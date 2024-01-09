@@ -1,7 +1,7 @@
 #include <raylib.h>
 
-#ifndef GAMEOBJECT_H
-#define GAMEOBJECT_H
+#pragma once
+
 
 /*
 * The base class for all objects in a `Scene` class
@@ -53,4 +53,3 @@ public:
     */
     virtual void on_exit() { /* Override to listen to event */ };
 };
-#endif

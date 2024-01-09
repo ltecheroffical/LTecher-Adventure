@@ -1,8 +1,7 @@
 #include <stdexcept>
 #include <gameobject.h>
 
-#ifndef PLAYER_H
-#define PLAYER_H
+#pragma once
 
 class Player : public GameObject
 {
@@ -18,4 +17,3 @@ private:
     int   max_health;
 
 };
-#endif

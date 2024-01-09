@@ -1,11 +1,12 @@
 #include <optional>
 #include <stdexcept>
+#include <memory>
 
 #include "scene.h"
 
-std::optional<Scene> Scene::current_scene = std::nullopt;
+std::optional<std::shared_ptr<Scene>> Scene::current_scene = std::nullopt;
 
-void Scene::set_current_scene(Scene scene)
+void Scene::set_current_scene(std::shared_ptr<Scene> scene)
 {
     if (Scene::is_scene_loaded())
     {
@@ -13,9 +14,10 @@ void Scene::set_current_scene(Scene scene)
     }
 
     Scene::current_scene = scene;
+    scene.get()->on_load();
 }
 
-Scene Scene::get_current_scene()
+std::shared_ptr<Scene> Scene::get_current_scene()
 {
     if (!Scene::current_scene.has_value())
     {
@@ -32,6 +34,6 @@ void Scene::unload_current_scene()
         throw std::make_unique<std::exception>();
     }
 
-    Scene::current_scene.value().on_unload();
+    Scene::current_scene.value()->on_unload();
     Scene::current_scene = std::nullopt;
 }

@@ -1,10 +1,11 @@
 #include <vector>
 #include <optional>
+#include <memory>
 
 #include <gameobject.h>
 
-#ifndef SCENE_H
-#define SCENE_H
+#pragma once
+
 
 /*
 * A scene that contains all `GameObject`s
@@ -22,7 +23,7 @@ public:
     * 
     * @param scene The scene to change to
     */
-    static void set_current_scene(Scene scene);
+    static void set_current_scene(std::shared_ptr<Scene> scene);
     /*
     * Gets the current scene
     * 
@@ -31,7 +32,7 @@ public:
     * 
     * @returns The current loaded scene
     */
-    static Scene get_current_scene();
+    static std::shared_ptr<Scene> get_current_scene();
 
     /*
     * Unloads the current scene
@@ -52,13 +53,28 @@ public:
     */
     virtual void on_load() { /* Override to listen to event */ };
     /*
+    * Called every frame while the scene is loaded
+    */
+    virtual void on_update() { /* Override to listen to event */ };
+    /*
     * Called when the scene is unloaded
     */
     virtual void on_unload() { /* Override to listen to event */ };
 
-private:
-    static std::optional<Scene> current_scene;
+    inline std::vector<std::shared_ptr<GameObject>> *get_children() {
+        return &this->objects;
+    };
+    
+    inline void add_child(GameObject *object) {
+        std::shared_ptr<GameObject> gameobject_ptr;
+        gameobject_ptr.reset(object);
 
-    std::vector<GameObject> objects;
+        this->objects.push_back(gameobject_ptr);
+        gameobject_ptr.get()->on_start();
+    };
+
+private:
+    static std::optional<std::shared_ptr<Scene>> current_scene;
+
+    std::vector<std::shared_ptr<GameObject>> objects;
 };
-#endif
