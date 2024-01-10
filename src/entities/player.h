@@ -1,19 +1,21 @@
 #include <stdexcept>
+
 #include <gameobject.h>
+
+#include <components/health.h>
 
 #pragma once
 
 class Player : public GameObject
 {
 public:
-    inline float get_health() { return health; };
-    inline int   get_max_health() { return max_health; };
+    Player();
+    ~Player() = default;
 
-    inline void  set_health(int health) { this->health = health; };
-    inline void  set_max_health(int max_health) { this->max_health = max_health; };
+    Health health;
+
+    void on_update(float delta) override;
+    void on_render() override;
 
 private:
-    float health;
-    int   max_health;
-
 };

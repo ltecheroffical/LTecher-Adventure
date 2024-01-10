@@ -65,12 +65,9 @@ public:
         return &this->objects;
     };
     
-    inline void add_child(GameObject *object) {
-        std::shared_ptr<GameObject> gameobject_ptr;
-        gameobject_ptr.reset(object);
-
-        this->objects.push_back(gameobject_ptr);
-        gameobject_ptr.get()->on_start();
+    inline void add_child(std::shared_ptr<GameObject> object) {
+        this->objects.push_back(object);
+        object.get()->on_start();
     };
 
 private:
