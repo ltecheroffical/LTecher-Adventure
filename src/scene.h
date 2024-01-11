@@ -83,6 +83,10 @@ public:
         return object_map.at(id);
     };
 
+    inline bool has_child(int id) const {
+        return object_map.contains(id);
+    };
+
 private:
     static std::optional<std::shared_ptr<Scene>> current_scene;
 
