@@ -80,6 +80,10 @@ public:
     };
 
     inline std::shared_ptr<GameObject> get_child(int id) {
+        if (!object_map.contains(id))
+        {
+            return nullptr;
+        }
         return object_map.at(id);
     };
 
