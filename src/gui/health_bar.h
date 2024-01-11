@@ -1,4 +1,4 @@
-#include <stdexcept>
+#include <raylib.h>
 
 #include <gameobject.h>
 
@@ -6,18 +6,18 @@
 
 #pragma once
 
-class Player : public GameObject
+class HealthBar : public GameObject
 {
 public:
-    Player();
-    ~Player() override = default;
+    HealthBar();
+    ~HealthBar() = default;
 
     Health health = Health(250);
 
-    void on_update(float delta) override;
     void on_render() override;
 
 private:
     static bool resources_loaded;
-    static Texture texture_player_atlas;
+
+    static Texture texture_health_bar_atlas;
 };

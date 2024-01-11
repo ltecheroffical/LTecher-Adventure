@@ -1,6 +1,8 @@
 #include <vector>
+#include <map>
 #include <optional>
 #include <memory>
+#include <random>
 
 #include <gameobject.h>
 
@@ -17,6 +19,8 @@ class Scene
 public:
     Scene() = default;
     virtual ~Scene() = default;
+
+    static const int OBJ_ID_NONE = -1;
 
     /*
     * Sets the current loaded scene
@@ -55,7 +59,7 @@ public:
     /*
     * Called every frame while the scene is loaded
     */
-    virtual void on_update() { /* Override to listen to event */ };
+    virtual void on_update(float delta) { /* Override to listen to event */ };
     /*
     * Called when the scene is unloaded
     */
@@ -65,13 +69,23 @@ public:
         return &this->objects;
     };
     
-    inline void add_child(std::shared_ptr<GameObject> object) {
+    inline void add_child(std::shared_ptr<GameObject> object, int id) {
         this->objects.push_back(object);
         object.get()->on_start();
+
+        if (id != Scene::OBJ_ID_NONE)
+        {
+            object_map.try_emplace(id, object);
+        }
+    };
+
+    inline std::shared_ptr<GameObject> get_child(int id) {
+        return object_map.at(id);
     };
 
 private:
     static std::optional<std::shared_ptr<Scene>> current_scene;
 
     std::vector<std::shared_ptr<GameObject>> objects;
+    std::map<int, std::shared_ptr<GameObject>> object_map;
 };

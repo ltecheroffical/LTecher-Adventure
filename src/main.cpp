@@ -62,13 +62,17 @@ float process_splash(float splash_time_passed, float blank_splash_time, Texture 
 
 int main()
 {
+	if (!std::filesystem::exists(RESOURCES_PATH))
+	{
+		std::cerr << "ERROR: FATAL: RESOURCES NOT FOUND!" << std::endl;
+		return 1;
+	}
+	
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "LTecher Adventure");
 
 	SetWindowState(FLAG_WINDOW_RESIZABLE);
 
 	InitAudioDevice();
-
-	bool resources_exist = std::filesystem::exists(RESOURCES_PATH);
 
 	Scene::set_current_scene(std::make_shared<GameScene>());
 
@@ -80,17 +84,8 @@ int main()
 	bool splash_unloaded = false;
 
 
-	Sound fx_splash{};
-	Texture splash_texture{};
-
-	if (!resources_exist)
-	{
-		std::cerr << "ERROR: FATAL: RESOURCES NOT FOUND!" << std::endl;
-		return 1;
-	}
-
-	fx_splash = LoadSound(RESOURCES_PATH "audio/sfx/start.wav");
-	splash_texture = LoadTexture(RESOURCES_PATH "images/branding/Splash.png");
+	Sound fx_splash        = LoadSound(RESOURCES_PATH "audio/sfx/start.wav");
+	Texture splash_texture = LoadTexture(RESOURCES_PATH "images/branding/Splash.png");
 
 	while (!WindowShouldClose())
 	{
@@ -118,7 +113,7 @@ int main()
 
 		if (Scene::is_scene_loaded())
 		{
-			Scene::get_current_scene()->on_update();
+			Scene::get_current_scene()->on_update(GetFrameTime());
 			
 			update_objects(Scene::get_current_scene()->get_children());
 			render_objects(Scene::get_current_scene()->get_children());

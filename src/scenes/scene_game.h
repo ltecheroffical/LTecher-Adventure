@@ -8,4 +8,5 @@ public:
     ~GameScene() override = default;
 
     void on_load() override;
+    void on_update(float delta) override;
 };

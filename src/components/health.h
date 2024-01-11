@@ -3,7 +3,7 @@
 class Health
 {
 public:
-    Health(float max);
+    explicit Health(float max);
     Health(float max, float inital);
     ~Health() = default;
 
