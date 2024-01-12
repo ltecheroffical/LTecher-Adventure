@@ -6,7 +6,7 @@ class UIElement : public GameObject
 {
 public:
     UIElement() = default;
-    virtual ~UIElement() override;
+    ~UIElement() override = default;
 
     Vector2 size{50, 50};
 
