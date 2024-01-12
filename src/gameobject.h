@@ -30,6 +30,10 @@ public:
     * If the rendering of the gameobject is skipped
     */
     bool visible = true;
+    /*
+    * If the gameobject is rendered on top
+    */
+    bool is_gui = false;
 
     /*
     * Called once the object enters the scene

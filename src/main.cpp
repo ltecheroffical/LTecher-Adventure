@@ -10,9 +10,6 @@
 
 #include <scenes/scene_game.h>
 
-constexpr int SCREEN_WIDTH = 800;
-constexpr int SCREEN_HEIGHT = 450;
-
 #pragma region Update Objects
 void update_objects(const std::vector<std::shared_ptr<GameObject>> *objects)
 {
@@ -26,7 +23,16 @@ void render_objects(const std::vector<std::shared_ptr<GameObject>> *objects)
 {
 	for (std::shared_ptr<GameObject> object : *objects)
 	{
-		if (!object->visible)
+		if (!object->visible || object->is_gui)
+		{
+			continue;
+		}
+		object->on_render();
+	}
+
+	for (std::shared_ptr<GameObject> object : *objects)
+	{
+		if (!object->visible || !object->is_gui)
 		{
 			continue;
 		}
@@ -69,7 +75,7 @@ int main()
 		return 1;
 	}
 	
-	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "LTecher Adventure");
+	InitWindow(App::DEFAULT_SCREEN_WIDTH, App::DEFAULT_SCREEN_HEIGHT, "LTecher Adventure");
 
 	SetWindowState(FLAG_WINDOW_RESIZABLE);
 	SetWindowMinSize(450, 350);

@@ -1,4 +1,5 @@
 #include <raylib.h>
+#include <raymath.h>
 
 #include "camera.h"
 
@@ -29,8 +30,13 @@ void Player::on_update(float delta)
     direction.x = static_cast<float>(IsKeyDown(KEY_D)) - static_cast<float>(IsKeyDown(KEY_A));
     direction.y = static_cast<float>(IsKeyDown(KEY_S)) - static_cast<float>(IsKeyDown(KEY_W));
 
-    this->position.x -= direction.x * SPEED * delta;
-    this->position.y -= direction.y * SPEED * delta;
+    if (direction.x != 0 || direction.y != 0)
+    {
+        direction = Vector2Normalize(direction);
+        
+        this->position.x -= direction.x * SPEED * delta;
+        this->position.y -= direction.y * SPEED * delta;
+    }
 
     this->health.damage(delta * 15);
 }
