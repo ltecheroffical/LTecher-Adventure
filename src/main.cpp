@@ -6,6 +6,7 @@
 
 #include <gameobject.h>
 #include <scene.h>
+#include <app.h>
 
 #include <scenes/scene_game.h>
 
@@ -71,6 +72,7 @@ int main()
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "LTecher Adventure");
 
 	SetWindowState(FLAG_WINDOW_RESIZABLE);
+	SetWindowMinSize(450, 350);
 
 	InitAudioDevice();
 
@@ -83,11 +85,10 @@ int main()
 	bool splash_fx_played = false;
 	bool splash_unloaded = false;
 
-
 	Sound fx_splash        = LoadSound(RESOURCES_PATH "audio/sfx/start.wav");
 	Texture splash_texture = LoadTexture(RESOURCES_PATH "images/branding/Splash.png");
 
-	while (!WindowShouldClose())
+	while (!WindowShouldClose() && App::is_running())
 	{
 		if (remaining_splash_time > 0)
 		{
@@ -108,17 +109,15 @@ int main()
 		}
 
 		BeginDrawing();
+			ClearBackground({0, 255, 255, 255});
 
-		ClearBackground({0, 255, 255, 255});
-
-		if (Scene::is_scene_loaded())
-		{
-			Scene::get_current_scene()->on_update(GetFrameTime());
-			
-			update_objects(Scene::get_current_scene()->get_children());
-			render_objects(Scene::get_current_scene()->get_children());
-		} 
-
+			if (Scene::is_scene_loaded())
+			{
+				Scene::get_current_scene()->on_update(GetFrameTime());
+				
+				update_objects(Scene::get_current_scene()->get_children());
+				render_objects(Scene::get_current_scene()->get_children());
+			} 
 		EndDrawing();
 	}
 

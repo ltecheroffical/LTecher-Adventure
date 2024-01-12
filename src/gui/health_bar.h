@@ -1,16 +1,16 @@
 #include <raylib.h>
 
-#include <gameobject.h>
+#include <gui/ui_element.h>
 
 #include <components/health.h>
 
 #pragma once
 
-class HealthBar : public GameObject
+class HealthBar : public UIElement
 {
 public:
     HealthBar();
-    ~HealthBar() = default;
+    ~HealthBar() override = default;
 
     Health health = Health(250);
 
@@ -19,5 +19,5 @@ public:
 private:
     static bool resources_loaded;
 
-    static Texture texture_health_bar_atlas;
+    static Texture texture_health_atlas;
 };
