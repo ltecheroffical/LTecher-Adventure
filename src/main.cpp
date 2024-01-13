@@ -80,6 +80,10 @@ int main()
 	SetWindowState(FLAG_WINDOW_RESIZABLE);
 	SetWindowMinSize(450, 350);
 
+#ifdef WIN32
+	SetWindowIcon(LoadImage(RESOURCES_PATH "images/branding/icon.png"));
+#endif
+
 	InitAudioDevice();
 
 	Scene::set_current_scene(std::make_shared<GameScene>());
