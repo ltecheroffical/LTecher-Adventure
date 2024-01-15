@@ -88,6 +88,7 @@ int main()
 
 	Scene::set_current_scene(std::make_shared<GameScene>());
 
+	#if PRODUCTION_BUILD != 0
 	constexpr float blank_splash_time = 1.5;
 	
 	float remaining_splash_time = 3.5;
@@ -97,9 +98,11 @@ int main()
 
 	Sound fx_splash        = LoadSound(RESOURCES_PATH "audio/sfx/start.wav");
 	Texture splash_texture = LoadTexture(RESOURCES_PATH "images/branding/Splash.png");
+	#endif
 
 	while (!WindowShouldClose() && App::is_running())
 	{
+		#if PRODUCTION_BUILD != 0
 		if (remaining_splash_time > 0)
 		{
 			if (remaining_splash_time < blank_splash_time && !splash_fx_played)
@@ -117,6 +120,7 @@ int main()
 
 			splash_unloaded = true;
 		}
+		#endif
 
 		BeginDrawing();
 			ClearBackground({0, 255, 255, 255});

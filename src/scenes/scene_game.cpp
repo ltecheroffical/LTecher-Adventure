@@ -53,7 +53,7 @@ void GameScene::on_update(float delta)
     obj_panel->panel_color = { 0, 0, 0, 240 };
 
     obj_panel->size = { static_cast<float>(GetScreenWidth()),  static_cast<float>(GetScreenHeight()) / 8.0f };
-    obj_panel->position = { 0.0f,  static_cast<float>(GetScreenHeight()) - obj_panel->size.y + 0.5f };
+    obj_panel->position = { 0.0f,  static_cast<float>(GetScreenHeight()) - obj_panel->size.y + (GetScreenHeight()/100) };
 
     
     obj_health_bar->size.x = obj_panel->size.x / 4;

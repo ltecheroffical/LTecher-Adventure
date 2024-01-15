@@ -7,8 +7,6 @@ project(ltecher_adventure)
 
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
-option(PRODUCTION_BUILD "Make this a production build" OFF)
-
 add_subdirectory(thirdparty/raylib)				# Game Engine
 
 file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
@@ -19,7 +17,7 @@ add_executable("${CMAKE_PROJECT_NAME}")
 set_property(TARGET "${CMAKE_PROJECT_NAME}" PROPERTY CXX_STANDARD 20)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
-	target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC RESOURCES_PATH="./resources/")
+	target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC RESOURCES_PATH="resources/")
 	target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC PRODUCTION_BUILD=1) 
 else()
 	target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC PRODUCTION_BUILD=0) 	
