@@ -12,7 +12,7 @@ public:
     Player();
     ~Player() override = default;
 
-    Health health = Health(20);
+    Health health = Health(10);
 
     void on_update(float delta) override;
     void on_render() override;

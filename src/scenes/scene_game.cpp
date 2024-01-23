@@ -55,13 +55,13 @@ void GameScene::on_update(float delta)
     obj_panel->panel_color = { 0, 0, 0, 240 };
 
     obj_panel->size = { static_cast<float>(GetScreenWidth()),  static_cast<float>(GetScreenHeight()) / 8.0f };
-    obj_panel->position = { 0.0f,  static_cast<float>(GetScreenHeight()) - obj_panel->size.y + (float)(GetScreenHeight()/100) };
+    obj_panel->position = { 0.0f,  static_cast<float>(GetScreenHeight()) - obj_panel->size.y + (float)(GetScreenHeight() / 100) };
 
     
-    obj_health_bar->size.x = (float)GetScreenWidth() / 45.0f;
-    obj_health_bar->size.y = (float)GetScreenHeight() / 25.0f;
+    obj_health_bar->size.x = (float)GetScreenWidth() / 46.0f;
+    obj_health_bar->size.y = (float)GetScreenHeight() / 26.0f;
 
-    obj_health_bar->position.y = obj_panel->position.y + ((obj_panel->size.y - obj_health_bar->size.y) / 2);
+    obj_health_bar->position.y = obj_panel->position.y + (((obj_panel->size.y - obj_health_bar->size.y) / 2) - 7.0f);
 
     obj_health_bar->health = obj_player->health;
 }

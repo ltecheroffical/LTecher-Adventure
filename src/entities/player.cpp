@@ -38,7 +38,7 @@ void Player::on_update(float delta)
         this->position.y -= direction.y * SPEED * delta;
     }
 
-    this->health.damage(delta);
+    this->health.damage(delta * 0.1f);
 }
 
 void Player::on_render()

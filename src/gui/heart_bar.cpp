@@ -1,5 +1,7 @@
 #include <raylib.h>
 
+#include <cmath>
+
 #include "heart_bar.h"
 
 bool HeartBar::resources_loaded = false;
@@ -17,7 +19,13 @@ HeartBar::HeartBar()
 
 void HeartBar::on_render()
 {
-    auto health_hearts = static_cast<int>(health.get_health(true) * 10);
+    auto cur_health = this->health.get_health(true) * 10;
+    auto health_hearts = (int)cur_health;
+
+    if (cur_health > 1)
+    {
+        health_hearts = (int)std::roundf(cur_health);
+    }
     
     for (int i = 0; i < 10; i++)
     {
