@@ -7,7 +7,7 @@
 class GameCamera : public GameObject
 {
 public:
-    GameCamera();
+    GameCamera() = default;
     ~GameCamera() override;
 
     // The current camera
@@ -18,5 +18,11 @@ public:
     // Camera zoom (scaling)
     float zoom = 1.0f;
 
+    // Is the camera enabled?
+    bool enabled = true;
+
     Camera2D to_camera_2d() const;
+
+    void on_start() override;
+    void on_update(float delta) override;
 };
