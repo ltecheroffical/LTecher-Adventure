@@ -8,7 +8,13 @@
 #include <scene.h>
 #include <app.h>
 
+#include <marcos/compare.h>
+
+#include <plugin.h>
+#include <extensions/debug.h>
+
 #include <scenes/scene_game.h>
+
 
 #pragma region Update Objects
 void update_objects(const std::vector<std::shared_ptr<GameObject>> *objects)
@@ -17,10 +23,16 @@ void update_objects(const std::vector<std::shared_ptr<GameObject>> *objects)
 	{
 		object->on_update(GetFrameTime());
 	}
+
+	for (std::shared_ptr<Plugin> extension : *App::get_loaded_plugins())
+	{
+		extension.get()->on_update(GetFrameTime());
+	}
 }
 
 void render_objects(const std::vector<std::shared_ptr<GameObject>> *objects)
 {
+
 	for (std::shared_ptr<GameObject> object : *objects)
 	{
 		if (!object->visible || object->is_gui)
@@ -37,6 +49,11 @@ void render_objects(const std::vector<std::shared_ptr<GameObject>> *objects)
 			continue;
 		}
 		object->on_render();
+	}
+
+	for (std::shared_ptr<Plugin> extension : *App::get_loaded_plugins())
+	{
+		extension.get()->on_render();
 	}
 }
 #pragma endregion
@@ -86,6 +103,8 @@ int main()
 
 	InitAudioDevice();
 
+	SetTargetFPS(60); // -1 Will disable frame cap
+
 	Scene::set_current_scene(std::make_shared<GameScene>());
 
 	#if PRODUCTION_BUILD != 0
@@ -98,7 +117,14 @@ int main()
 
 	Sound fx_splash        = LoadSound(RESOURCES_PATH "audio/sfx/start.wav");
 	Texture splash_texture = LoadTexture(RESOURCES_PATH "images/branding/Splash.png");
+	#else
+	App::load_plugin(std::make_shared<Debugger>());
 	#endif
+	
+	for (std::shared_ptr<Plugin> extension : *App::get_loaded_plugins())
+	{
+		extension.get()->on_game_start();
+	}
 
 	while (!WindowShouldClose() && App::is_running())
 	{
@@ -132,6 +158,11 @@ int main()
 				update_objects(Scene::get_current_scene()->get_children());
 				render_objects(Scene::get_current_scene()->get_children());
 			} 
+		
+		if (!CLRCMP(App::screen_tint, WHITE))
+		{
+			DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(App::screen_tint, 0.2f));
+		}
 		EndDrawing();
 	}
 

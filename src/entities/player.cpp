@@ -1,6 +1,8 @@
 #include <raylib.h>
 #include <raymath.h>
 
+#include <app.h>
+
 #include "camera.h"
 
 #include "player.h"
@@ -46,8 +48,10 @@ void Player::on_render()
     Camera2D game_camera = GameCamera::camera->to_camera_2d();
 
     BeginMode2D(game_camera);
-
-    DrawTexturePro(Player::texture_player_atlas, {0, 0, 16, 16}, {0, 0, 16 * 1.2f * this->scale, 16 * this->scale}, this->position, 0, WHITE);
+    
+    DrawTexturePro(Player::texture_player_atlas, 
+                   {0, 0, 16, 16}, {0, 0, 16 * 1.2f * this->scale, 16 * this->scale},
+                this->position, 0, WHITE);
     
     EndMode2D();
 }

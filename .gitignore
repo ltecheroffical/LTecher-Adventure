@@ -1,7 +1,10 @@
 # Build
 build/
 
+# Neovim
 compile_commands.json
+build_project.sh
+run_project.sh
 
 # MacOS
 .DS_Store
