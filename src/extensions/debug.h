@@ -2,13 +2,14 @@
 
 #pragma once
 
-#if PRODUCTION_BUILD == 0
 class Debugger : public Plugin
 {
 public:
     Debugger() = default;
     ~Debugger() override = default;
-
+    
+    static bool is_visible;
+    
+    void on_update(float delta) override;
     void on_render() override;
 };
-#endif
