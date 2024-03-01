@@ -1,5 +1,9 @@
 #include <raylib.h>
 
+#include <string>
+
+#include <os_info.h>
+
 #include "debug.h"
 
 bool Debugger::is_visible = false;
@@ -18,28 +22,29 @@ void Debugger::on_render()
   {
     return;
   }
-  
-  #if defined(__APPLE__)
-    #define PLATFORM "Apple"
-  #elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-    #ifdef _WIN64
-      #define PLATFORM "Win64"
-    #else
-      #define PLATFORM "Win32"
-    #endif
-  #elif defined(__linux__)
-    #define PLATFORM "Linux"
-  #else
-    #define PLATFORM "UNKNOWN"
-  #endif
-  
+   
   #define H_SPACING 5
-  #define V_OFFSET 5
+  #define V_SPACING 5
 
-  DrawFPS(V_OFFSET, H_SPACING);
+  this->draw_info(V_SPACING, H_SPACING, 20);
+  this->draw_preformance(V_SPACING, H_SPACING * 8, 20);
+}
 
-  DrawText(PLATFORM, 5, H_SPACING * 6, 20, WHITE);
-  #if PRODUCTION_BUILD == 0
-  DrawText("DEBUG BUILD", MeasureText(PLATFORM, 20) + 25, H_SPACING * 6, 20, RED);
-  #endif
+void Debugger::draw_preformance(int x, int y, int size)
+{
+  DrawFPS(x, y);
+}
+
+void Debugger::draw_info(int x, int y, int size)
+{  
+  std::string os_name;
+
+  os_name.append(OS::get_name());
+  os_name.append(" ");
+  os_name.append(OS::get_version());
+
+  DrawText(os_name.c_str(), x, y, size, WHITE);
+#if PRODUCTION_BUILD == 0
+  DrawText("DEBUG BUILD", MeasureText(os_name.c_str(), size) + 15, y, size, RED);
+#endif
 }

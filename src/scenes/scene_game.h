@@ -1,12 +1,16 @@
 #include <scene.h>
+#include <gui/screens/game_hud.h>
 
 #pragma once
 class GameScene : public Scene
 {
-public:
-    GameScene() = default;
-    ~GameScene() override = default;
+private:
+  GameHUD *screen = new GameHUD(this);
 
-    void on_load() override;
-    void on_update(float delta) override;
+public:
+  GameScene() = default;
+  ~GameScene() override = default;
+
+  void on_load() override;
+  void on_update(float delta) override;
 };
