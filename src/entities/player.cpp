@@ -1,6 +1,8 @@
 #include <raylib.h>
 #include <raymath.h>
 
+#include <asset_ids.h>
+
 #include <app.h>
 
 #include "camera.h"
@@ -16,8 +18,12 @@ Player::Player()
 {
     if (!Player::resources_loaded)
     {
-        Player::texture_player_atlas = LoadTexture(RESOURCES_PATH "images/entites/player.png");
-        Player::resources_loaded = true;
+      // Load player texture
+      Image image_player_atlas = LoadImageFromMemory(".png", (unsigned char*)assets.at(100), (int)asset_sizes.at(100));
+      Player::texture_player_atlas = LoadTextureFromImage(image_player_atlas);
+      UnloadImage(image_player_atlas);
+
+      Player::resources_loaded = true;
     }
 
     this->scale = 5;

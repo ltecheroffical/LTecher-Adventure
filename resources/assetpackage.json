@@ -1,0 +1,28 @@
+[
+  {
+    "path": "images/branding/icon.png",
+    "id": 0
+  },
+  {
+    "path": "images/branding/logo.png",
+    "id": 1
+  },
+  {
+    "path": "images/branding/splash.png",
+    "id": 2
+  },
+  {
+    "path": "audio/sfx/start.wav",
+    "id": 10
+  },
+
+  {
+    "path": "images/entites/player.png",
+    "id": 100
+  },
+
+  {
+    "path": "ui/heart.png",
+    "id": 200
+  }
+]

@@ -1,5 +1,6 @@
 # Build
 build/
+gameassets.ltassets
 
 # Neovim
 compile_commands.json

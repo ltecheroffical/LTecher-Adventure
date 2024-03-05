@@ -3,6 +3,7 @@
 #include <filesystem>
 
 #include <raylib.h>
+#include <asset_ids.h>
 
 #include <gameobject.h>
 #include <scene.h>
@@ -90,7 +91,7 @@ int main()
 	{
 		std::cerr << "ERROR: FATAL: RESOURCES NOT FOUND!" << std::endl;
 		return 1;
-	}
+	} 
 	
 	InitWindow(App::DEFAULT_SCREEN_WIDTH, App::DEFAULT_SCREEN_HEIGHT, "LTecher Adventure");
 
@@ -98,28 +99,42 @@ int main()
 	SetWindowMinSize(450, 350);
 
 #ifdef WIN32
-	SetWindowIcon(LoadImage(RESOURCES_PATH "images/branding/icon.png"));
+	SetWindowIcon(LoadImageFromMemory(".png", (unsigned char*)assets.at(0), asset_sizes.at(0)));
 #endif
 
 	InitAudioDevice();
 
 	SetTargetFPS(60); // -1 Will disable frame cap
 
-	Scene::set_current_scene(std::make_shared<GameScene>());
+  try
+  {
+    load_assets((char*)RESOURCES_PATH);
+  }
+  catch (char *error_message)
+  {
+    std::cerr << "ERROR: FATAL: RESOURCES COULD NOT LOAD! " << error_message << std::endl;
+    return 1;
+  }
 
-	#if PRODUCTION_BUILD != 0
+
 	constexpr float blank_splash_time = 1.5;
 	
 	float remaining_splash_time = 3.5;
 
 	bool splash_fx_played = false;
 	bool splash_unloaded = false;
+  
+  Wave  fx_splash_wave   = LoadWaveFromMemory(".wav", (unsigned char*)assets.at(10), asset_sizes.at(10));
+	Sound fx_splash        = LoadSoundFromWave(fx_splash_wave);
+  UnloadWave(fx_splash_wave);
 
-	Sound fx_splash        = LoadSound(RESOURCES_PATH "audio/sfx/start.wav");
-	Texture splash_texture = LoadTexture(RESOURCES_PATH "images/branding/Splash.png");
-	#else
+  Image   splash_image   = LoadImageFromMemory(".png", (unsigned char*)assets.at(2), asset_sizes.at(2));
+	Texture splash_texture = LoadTextureFromImage(splash_image);
+  UnloadImage(splash_image);
+	
+  #if PRODUCTION_BUILD == 0
 	App::load_plugin(std::make_shared<Debugger>());
-	#endif
+  #endif
 	
 	for (std::shared_ptr<Plugin> extension : *App::get_loaded_plugins())
 	{
@@ -128,7 +143,6 @@ int main()
 
 	while (!WindowShouldClose() && App::is_running())
 	{
-		#if PRODUCTION_BUILD != 0
 		if (remaining_splash_time > 0)
 		{
 			if (remaining_splash_time < blank_splash_time && !splash_fx_played)
@@ -145,8 +159,8 @@ int main()
 			UnloadTexture(splash_texture);
 
 			splash_unloaded = true;
+      Scene::set_current_scene(std::make_shared<GameScene>());
 		}
-		#endif
 
 		BeginDrawing();
 			ClearBackground({0, 255, 255, 255});
@@ -165,6 +179,8 @@ int main()
 		}
 		EndDrawing();
 	}
+  
+  unload_assets();
 
 	CloseAudioDevice();
 	CloseWindow();
