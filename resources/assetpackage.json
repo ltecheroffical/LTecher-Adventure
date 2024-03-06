@@ -16,13 +16,25 @@
     "id": 10
   },
 
+
   {
     "path": "images/entites/player.png",
     "id": 100
   },
 
+
+  {
+    "path": "fonts/m5x7.ttf",
+    "id": 1000
+  },
+  
   {
     "path": "ui/heart.png",
-    "id": 200
+    "id": 1100
+  },
+
+  {
+    "path": "images/ui/screens/screen_inventory.png",
+    "id": 1200
   }
 ]

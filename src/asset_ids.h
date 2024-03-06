@@ -48,7 +48,7 @@ inline void load_assets(char *path)
     memcpy(asset_data, data + i, asset_size);
 
     assets.try_emplace((int)asset_id, asset_data);
-    asset_sizes.try_emplace((int)asset_id, asset_size);
+    asset_sizes.try_emplace((int)asset_id, asset_size); 
 
     // Skip past the asset data
     i += asset_size - 1;

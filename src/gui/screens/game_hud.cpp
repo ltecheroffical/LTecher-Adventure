@@ -4,7 +4,7 @@
 
 #include <extensions/debug.h>
 
-#include <gui/heart_bar.h>
+#include <gui/custom/heart_bar.h>
 #include <gui/panel.h>
 
 #include "screen.h"
@@ -14,7 +14,12 @@
 
 GameHUD::GameHUD(Scene *scene) : Screen(scene)
 {
+  this->inventory = new Inventory(scene);
+}
 
+GameHUD::~GameHUD()
+{
+  delete this->inventory;
 }
 
 void GameHUD::init()
@@ -49,4 +54,11 @@ void GameHUD::update(float delta)
   obj_health_bar->size.y = (float)GetScreenHeight() / 26.0f;
 
   obj_health_bar->position.y = ref_panel_pos.y + ((ref_panel_size.y - obj_health_bar->size.y) / 2);
+  
+  this->inventory->update(delta);
+}
+
+void GameHUD::render()
+{
+  this->inventory->render();
 }

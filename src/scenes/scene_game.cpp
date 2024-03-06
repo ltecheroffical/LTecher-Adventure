@@ -4,7 +4,7 @@
 #include <entities/player.h>
 #include <entities/camera.h>
 
-#include <gui/heart_bar.h>
+#include <gui/custom/heart_bar.h>
 
 #include <gui/screens/game_hud.h>
 
@@ -41,4 +41,6 @@ void GameScene::on_update(float delta)
   obj_camera->position = obj_player->position;
 
   obj_health_bar->health = obj_player->health;
+
+  this->screen->render();
 }
