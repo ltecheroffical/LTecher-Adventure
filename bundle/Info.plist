@@ -11,7 +11,7 @@
 	<key>CFBundleIconFile</key>
 	<string>icon.icns</string>
 	<key>CFBundleGetInfoString</key>
-	<string>LTecher Adventure (LTecher)</string>
+	<string>LTecher Adventure</string>
 	<key>CFBundleExecutable</key>
 	<string>run.sh</string>
 </dict>

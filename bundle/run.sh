@@ -3,4 +3,4 @@
 cd "${0%/*}/../"
 cd Resources
 
-../MacOS/Game
+../MacOS/ltecher_adventure

@@ -1,3 +1,5 @@
+#include <raylib.h>
+
 #include "../screen.h"
 
 #pragma once
@@ -13,7 +15,8 @@ public:
 
 private:
   static bool resources_loaded;
-
+  
+  static Font inventory_font;
   static Texture inventory_popout;
 
 };
