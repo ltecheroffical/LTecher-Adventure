@@ -30,9 +30,6 @@ void Inventory::render()
   // Draw inventory popout at the center of the screen
   constexpr float inventory_scale = 1;
   DrawTextureEx(Inventory::inventory_popout, 
-                {18, ((float)GetScreenHeight() / 2 -
+                {00000, ((float)GetScreenHeight() / 2 -
                      Inventory::inventory_popout.height * inventory_scale / 2) - 15}, 0, inventory_scale, WHITE);
-
-  DrawTextEx(Inventory::inventory_font, "Inventory", {18 + 115, ((float)GetScreenHeight() / 2 -
-                     Inventory::inventory_popout.height * inventory_scale / 2) - 15}, 15, 2, WHITE);
 }
