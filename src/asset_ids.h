@@ -1,5 +1,7 @@
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
+
 #include <map>
 
 inline std::map<int, char*> assets;
@@ -18,6 +20,7 @@ inline void load_assets(char *path)
   char *data = (char*)malloc(file_size);
   
   assets_file.read(data, file_size);
+
   assets_file.close(); 
 
   int bytes_left = 0;
@@ -29,23 +32,26 @@ inline void load_assets(char *path)
     unsigned int asset_id = 0;
     unsigned int asset_size = 0;
 
-    memcpy(&asset_id, data + i, sizeof(int));
+    std::memcpy(&asset_id, data + i, sizeof(int));
     i += sizeof(int);
-    memcpy(&asset_size, data + i, sizeof(int));
+    std::memcpy(&asset_size, data + i, sizeof(int));
     i += sizeof(int);
 
     char *asset_data = (char*)malloc(asset_size);
-
+ 
     bytes_left -= (sizeof(int) * 2);
     
     if (bytes_left < asset_size)
     {
       // The assets may have been used as a buffer overflow attack
-      free(data);
       throw((char*)"Asset too large!");
     }
 
-    memcpy(asset_data, data + i, asset_size);
+    std::memcpy(asset_data, data + i, asset_size);
+
+    #if PRODUCTION_BUILD == 0
+    std::cout << "Asset Loaded! " << "Asset ID: " << asset_id << " Size: " << asset_size << std::endl;
+    #endif
 
     assets.try_emplace((int)asset_id, asset_data);
     asset_sizes.try_emplace((int)asset_id, asset_size); 

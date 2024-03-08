@@ -168,8 +168,8 @@ int main()
 			if (Scene::is_scene_loaded())
 			{
 				update_objects(Scene::get_current_scene()->get_children());
-				render_objects(Scene::get_current_scene()->get_children());
         Scene::get_current_scene()->on_update(GetFrameTime());
+				render_objects(Scene::get_current_scene()->get_children());
 			} 
 		
 		if (!CLRCMP(App::screen_tint, WHITE))

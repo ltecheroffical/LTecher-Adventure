@@ -31,10 +31,5 @@
   {
     "path": "ui/heart.png",
     "id": 1100
-  },
-
-  {
-    "path": "images/ui/screens/screen_inventory.png",
-    "id": 1200
   }
 ]
