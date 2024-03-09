@@ -14,6 +14,19 @@ bool Player::resources_loaded = false;
 
 Texture Player::texture_player_atlas;
 
+int wrap(int value, int min, int max)
+{
+  if (value < min)
+  {
+    return max;
+  }
+  else if (value > max)
+  {
+    return min;
+  } 
+  return value;
+}
+
 Player::Player()
 {
     if (!Player::resources_loaded)
@@ -31,22 +44,49 @@ Player::Player()
 
 void Player::on_update(float delta)
 {
-    constexpr float SPEED = 30.0;
+  constexpr float SPEED = 30.0;
 
-    Vector2 direction{0, 0};
+  Vector2 direction{0, 0};
+
+  this->anim_timer += delta; 
+  
+  direction.x = static_cast<float>(IsKeyDown(KEY_D)) - static_cast<float>(IsKeyDown(KEY_A));
+  direction.y = static_cast<float>(IsKeyDown(KEY_S)) - static_cast<float>(IsKeyDown(KEY_W));
+
+  if (direction.x != 0 || direction.y != 0)
+  {
+    direction = Vector2Normalize(direction);
     
-    direction.x = static_cast<float>(IsKeyDown(KEY_D)) - static_cast<float>(IsKeyDown(KEY_A));
-    direction.y = static_cast<float>(IsKeyDown(KEY_S)) - static_cast<float>(IsKeyDown(KEY_W));
-
-    if (direction.x != 0 || direction.y != 0)
+    if (this->anim_timer > 0.5f)
     {
-        direction = Vector2Normalize(direction);
-        
-        this->position.x -= direction.x * SPEED * delta;
-        this->position.y -= direction.y * SPEED * delta;
+      if (direction.y == -1)
+      {
+        this->frame = wrap(this->frame + 1, 4, 5);
+      }
+      else if (direction.y == 1)
+      {
+        this->frame = wrap(this->frame + 1, 2, 3);
+      }
+      else if (direction.x == -1)
+      {
+        this->frame = wrap(this->frame + 1, 6, 7);
+      }
+      else if (direction.x == 1)
+      {
+        this->frame = wrap(this->frame + 1, 8, 9);
+      }
+      this->anim_timer = 0.0f;
     }
 
-    this->health.damage(delta * 0.1f);
+    this->position.x -= direction.x * SPEED * delta;
+    this->position.y -= direction.y * SPEED * delta;
+  }
+  else if (this->anim_timer > 1.0f)
+  {
+    this->frame = wrap(this->frame + 1, 0, 1);
+    this->anim_timer = 0.0f;
+  }
+  this->health.damage(delta * 0.1f);
 }
 
 void Player::on_render()
@@ -56,7 +96,7 @@ void Player::on_render()
     BeginMode2D(game_camera);
     
     DrawTexturePro(Player::texture_player_atlas, 
-                   {0, 0, 16, 16}, {0, 0, 16 * 1.2f * this->scale, 16 * this->scale},
+                   {16 * (float)this->frame, 0, 16, 16}, {0, 0, 16 * 1.2f * this->scale, 16 * this->scale},
                 this->position, 0, WHITE);
     
     EndMode2D();
