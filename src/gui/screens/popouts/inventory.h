@@ -12,11 +12,4 @@ public:
 
   void render() override;
   void update(float delta) override {};
-
-private:
-  static bool resources_loaded;
-  
-  static Font inventory_font;
-  static Texture inventory_popout;
-
 };

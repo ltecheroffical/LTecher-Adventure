@@ -15,7 +15,7 @@ HeartBar::HeartBar()
 {
   if (!HeartBar::resources_loaded)
   {
-    Image image_heart_atlas = LoadImageFromMemory(".png", (unsigned char*)assets.at(1100), asset_sizes.at(1100));
+    Image image_heart_atlas = LoadImageFromMemory(".png", (unsigned char*)assets_raw.at(1100), asset_sizes.at(1100));
     texture_health_atlas = LoadTextureFromImage(image_heart_atlas);
     UnloadImage(image_heart_atlas);
   }

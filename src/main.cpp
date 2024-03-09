@@ -98,10 +98,6 @@ int main()
 	SetWindowState(FLAG_WINDOW_RESIZABLE);
 	SetWindowMinSize(450, 350);
 
-#ifdef WIN32
-	SetWindowIcon(LoadImageFromMemory(".png", (unsigned char*)assets.at(0), asset_sizes.at(0)));
-#endif
-
 	InitAudioDevice();
 
 	SetTargetFPS(60); // -1 Will disable frame cap
@@ -116,6 +112,10 @@ int main()
     return 1;
   }
 
+#ifdef WIN32
+	SetWindowIcon(LoadImageFromMemory(".png", (unsigned char*)assets_raw.at(0), asset_sizes.at(0)));
+#endif
+
 
 	constexpr float blank_splash_time = 1.5;
 	
@@ -124,11 +124,11 @@ int main()
 	bool splash_fx_played = false;
 	bool splash_unloaded = false;
   
-  Wave  fx_splash_wave   = LoadWaveFromMemory(".wav", (unsigned char*)assets.at(10), asset_sizes.at(10));
+  Wave  fx_splash_wave   = LoadWaveFromMemory(".wav", (unsigned char*)assets_raw.at(10), asset_sizes.at(10));
 	Sound fx_splash        = LoadSoundFromWave(fx_splash_wave);
   UnloadWave(fx_splash_wave);
 
-  Image   splash_image   = LoadImageFromMemory(".png", (unsigned char*)assets.at(2), asset_sizes.at(2));
+  Image   splash_image   = LoadImageFromMemory(".png", (unsigned char*)assets_raw.at(2), asset_sizes.at(2));
 	Texture splash_texture = LoadTextureFromImage(splash_image);
   UnloadImage(splash_image);
 	
@@ -178,8 +178,6 @@ int main()
 		}
 		EndDrawing();
 	}
-  
-  unload_assets();
 
 	CloseAudioDevice();
 	CloseWindow();

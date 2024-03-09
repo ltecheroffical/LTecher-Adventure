@@ -1,10 +1,14 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
-
+#include <vector>
 #include <map>
 
-inline std::map<int, char*> assets;
+#define vec std::vector
+
+inline std::map<int, vec<char>> assets;
+inline std::map<int, char*> assets_raw;
+
 inline std::map<int, unsigned int> asset_sizes;
 
 inline void load_assets(char *path)
@@ -17,9 +21,8 @@ inline void load_assets(char *path)
   assets_file.seekg(0, std::ios::beg);
 
   // Read entire file and save it into char*
-  char *data = (char*)malloc(file_size);
-  
-  assets_file.read(data, file_size);
+  vec<char> data((std::istreambuf_iterator<char>(assets_file)),
+                  std::istreambuf_iterator<char>());
 
   assets_file.close(); 
 
@@ -32,14 +35,16 @@ inline void load_assets(char *path)
     unsigned int asset_id = 0;
     unsigned int asset_size = 0;
 
-    std::memcpy(&asset_id, data + i, sizeof(int));
+    std::copy(&data[i], &data[i + sizeof(int)], reinterpret_cast<char*>(&asset_id));
+    bytes_left -= sizeof(int);
     i += sizeof(int);
-    std::memcpy(&asset_size, data + i, sizeof(int));
+    std::copy(&data[i], &data[i + sizeof(int)], reinterpret_cast<char*>(&asset_size));
+    bytes_left -= sizeof(int);
     i += sizeof(int);
 
-    char *asset_data = (char*)malloc(asset_size);
- 
-    bytes_left -= (sizeof(int) * 2);
+    vec<char> asset_data;
+    char     *asset_data_raw = (char*)malloc(asset_size);
+    asset_data.reserve(asset_size);
     
     if (bytes_left < asset_size)
     {
@@ -47,25 +52,27 @@ inline void load_assets(char *path)
       throw((char*)"Asset too large!");
     }
 
-    std::memcpy(asset_data, data + i, asset_size);
+    std::copy(&data[i], &data[i + asset_size], asset_data.begin());
+    std::copy(&data[i], &data[i + asset_size], asset_data_raw);
 
     #if PRODUCTION_BUILD == 0
     std::cout << "Asset Loaded! " << "Asset ID: " << asset_id << " Size: " << asset_size << std::endl;
     #endif
 
     assets.try_emplace((int)asset_id, asset_data);
+    assets_raw.try_emplace((int)asset_id, asset_data_raw);
+
     asset_sizes.try_emplace((int)asset_id, asset_size); 
 
     // Skip past the asset data
     i += asset_size - 1;
   }
-  free(data);
 }
 
 inline void unload_assets()
 {
   // Free all the assets
-  for (auto it = assets.begin(); it != assets.end(); it++)
+  for (auto it = assets_raw.begin(); it != assets_raw.end(); it++)
   {
     free(it->second);
   }
