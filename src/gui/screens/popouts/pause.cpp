@@ -1,5 +1,7 @@
 #include <raylib.h>
 
+#include <ltmath.h>
+#include <app.h>
 #include <asset_ids.h>
 
 #include "pause.h"
@@ -20,6 +22,10 @@ PauseMenu::PauseMenu(Scene *scene) : Screen(scene)
 
     PauseMenu::resources_loaded = true;
   }
+
+  // Fill out callbacks
+  this->menu_callbacks[0] = [&]() { this->paused = false; };
+  this->menu_callbacks[3] = [&]() { App::close(); };
 }
 
 void PauseMenu::update(float delta)
@@ -28,6 +34,17 @@ void PauseMenu::update(float delta)
   {
     this->paused = !this->paused;
   }
+
+  if (IsKeyPressed(KEY_UP))
+  {
+    this->selected--;
+  }
+  else if (IsKeyPressed(KEY_DOWN))
+  {
+    this->selected++;
+  }
+
+  this->selected = LTMath::wrap(this->selected, 0, 3);
 }
 
 void PauseMenu::render()
@@ -60,5 +77,18 @@ void PauseMenu::render()
     DrawRectangleLines(pause_rect.x - i, pause_rect.y - i,
                        pause_rect.width + i * 2, pause_rect.height + i * 2,
                         border_colors[(i > (border / 2) || i < (border / 2)) ? 1 : 0]);
+  }
+
+  for (int i = 0; i < this->menu_options.size(); i++)
+  {
+    const char *option = this->menu_options.at(i).c_str();
+    DrawTextEx(PauseMenu::inventory_font, option,
+               {((float)GetScreenWidth() - MeasureText(option, 16)) / 2,
+                ((float)GetScreenHeight() / 2.5f + (i * 16)) - 4.5f}, 16, 2, (this->selected == i) ? GREEN : WHITE);
+  }
+
+  if (IsKeyPressed(KEY_ENTER))
+  {
+    this->menu_callbacks.at(this->selected)();
   }
 }
