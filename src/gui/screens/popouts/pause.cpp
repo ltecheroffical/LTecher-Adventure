@@ -4,6 +4,8 @@
 
 #include <app.h>
 #include <asset_ids.h>
+
+#include <entities/player.h>
 #include <saving/game_save.h>
 
 #include "pause.h"
@@ -30,10 +32,12 @@ PauseMenu::PauseMenu(Scene *scene) : Screen(scene)
     this->paused = false;
   };
   this->menu_callbacks[1] = [&]() {
+    GameSave::current_save->players = Player::players;
     GameSave::current_save->save();
     this->paused = false;
   };
   this->menu_callbacks[2] = [&]() {
+    GameSave::current_save->players = Player::players;
     GameSave::current_save->save();
     App::close();
   };

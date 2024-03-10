@@ -26,7 +26,7 @@ void GameScene::on_load()
   auto obj_camera = std::make_shared<GameCamera>();
   
   this->add_child(obj_player, 0);
-  this->add_child(obj_camera, 500);
+  this->add_child(obj_camera, 500); 
 }
 
 void GameScene::on_update(float delta)
@@ -46,7 +46,7 @@ void GameScene::on_update(float delta)
 
   obj_camera->position = obj_player->position;
 
-  obj_health_bar->health = obj_player->health;
+  obj_health_bar->health = obj_player->health; 
 }
 
 void GameScene::on_render()

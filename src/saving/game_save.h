@@ -23,7 +23,7 @@ public:
   
   Image save_screenshot = LoadImageFromScreen();
 
-  std::vector<Player*> players;
+  std::vector<Player*> players = Player::players;
 
   static GameSave *current_save;
 

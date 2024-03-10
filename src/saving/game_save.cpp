@@ -8,6 +8,8 @@
 #include <scene.h>
 #include <app.h>
 
+#include <components/health.h>
+
 #include "game_save.h"
 
 GameSave *GameSave::current_save = nullptr;
@@ -47,6 +49,9 @@ void GameSave::save()
 
   uint8_t save_name_length = (uint8_t)this->save_name.length();
 
+
+
+#pragma region Screenshot
   this->data.resize(this->data.size() + sizeof(uint8_t));
   std::copy(reinterpret_cast<char*>(&save_name_length),
             reinterpret_cast<char*>(&save_name_length) + sizeof(uint8_t),
@@ -73,7 +78,7 @@ void GameSave::save()
     this->save_screenshot,
     ".png",
     &image_data_size);
-  
+
   std::vector<char> image_data(image_data_bytes, image_data_bytes + image_data_size);
 
   int image_file_size = (int)image_data.size();
@@ -86,6 +91,70 @@ void GameSave::save()
   std::copy(image_data.begin(),
             image_data.end(),
             this->data.end() - image_file_size);
+#pragma endregion
+
+
+
+  std::vector<char> player_data;
+  for (int i = 0; i < this->players.size(); i++)
+  {
+    Player *player = this->players[i];
+
+    float player_x = player->position.x;
+    float player_y = player->position.y;
+   
+    Health health = player->health;
+
+    float health_value = health.get_health();
+    float health_max = health.get_max();
+
+    int player_size = 0;
+
+    player_data.resize(player_data.size() + sizeof(int));
+    auto player_size_start = player_data.end() - sizeof(int);
+
+    player_data.resize(player_data.size() + sizeof(int));
+    player_size += sizeof(int);
+    std::copy(reinterpret_cast<char*>(&player_x),
+              reinterpret_cast<char*>(&player_x) + sizeof(float),
+              player_data.end() - sizeof(float));
+
+    player_data.resize(player_data.size() + sizeof(float));
+    player_size += sizeof(float);
+    std::copy(reinterpret_cast<char*>(&player_y),
+              reinterpret_cast<char*>(&player_y) + sizeof(float),
+              player_data.end() - sizeof(float));
+    
+
+    player_data.resize(player_data.size() + sizeof(int));
+    player_size += sizeof(float);
+    std::copy(reinterpret_cast<char*>(&health_value),
+              reinterpret_cast<char*>(&health_value) + sizeof(float),
+              player_data.end() - sizeof(float));
+
+    player_data.resize(player_data.size() + sizeof(float));
+    player_size += sizeof(float);
+    std::copy(reinterpret_cast<char*>(&health_max),
+              reinterpret_cast<char*>(&health_max) + sizeof(float),
+              player_data.end() - sizeof(float));
+    
+    std::copy(reinterpret_cast<char*>(&player_size),
+              reinterpret_cast<char*>(&player_size) + sizeof(int),
+              player_size_start);
+  }
+
+  int player_data_size = (int)player_data.size();
+
+  this->data.resize(this->data.size() + sizeof(int));
+  std::copy(reinterpret_cast<char*>(&player_data_size),
+            reinterpret_cast<char*>(&player_data_size) + sizeof(int),
+            this->data.end() - sizeof(int));
+  
+  this->data.resize(this->data.size() + player_data_size);
+  std::copy(player_data.begin(),
+            player_data.end(),
+            this->data.end() - player_data_size);
+
 
   this->save_file.clear();
   for (int i = 0; i < this->data.size(); i++)
