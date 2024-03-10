@@ -1,3 +1,4 @@
+#include "extensions/game_save.h"
 #include <iostream>
 #include <vector>
 #include <filesystem>
@@ -28,33 +29,6 @@ void update_objects(const std::vector<std::shared_ptr<GameObject>> *objects)
 	for (std::shared_ptr<Plugin> extension : *App::get_loaded_plugins())
 	{
 		extension.get()->on_update(GetFrameTime());
-	}
-}
-
-void render_objects(const std::vector<std::shared_ptr<GameObject>> *objects)
-{
-
-	for (std::shared_ptr<GameObject> object : *objects)
-	{
-		if (!object->visible || object->is_gui)
-		{
-			continue;
-		}
-		object->on_render();
-	}
-
-	for (std::shared_ptr<GameObject> object : *objects)
-	{
-		if (!object->visible || !object->is_gui)
-		{
-			continue;
-		}
-		object->on_render();
-	}
-
-	for (std::shared_ptr<Plugin> extension : *App::get_loaded_plugins())
-	{
-		extension.get()->on_render();
 	}
 }
 #pragma endregion
@@ -134,6 +108,7 @@ int main()
 	
   #if PRODUCTION_BUILD == 0
 	App::load_plugin(std::make_shared<Debugger>());
+  App::load_plugin(std::make_shared<GameSave>());
   #endif
 	
 	for (std::shared_ptr<Plugin> extension : *App::get_loaded_plugins())
@@ -169,7 +144,7 @@ int main()
 			{
 				update_objects(Scene::get_current_scene()->get_children());
         Scene::get_current_scene()->on_update(GetFrameTime());
-				render_objects(Scene::get_current_scene()->get_children());
+        App::render_objects(Scene::get_current_scene()->get_children());
 			} 
 		
 		if (!CLRCMP(App::screen_tint, WHITE))

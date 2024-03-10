@@ -10,6 +10,8 @@
 #include "player.h"
 
 
+std::vector<Player*> Player::players;
+
 bool Player::resources_loaded = false;
 
 Texture Player::texture_player_atlas;
@@ -29,17 +31,26 @@ int wrap(int value, int min, int max)
 
 Player::Player()
 {
-    if (!Player::resources_loaded)
-    {
-      // Load player texture
-      Image image_player_atlas = LoadImageFromMemory(".png", (unsigned char*)assets_raw.at(100), (int)asset_sizes.at(100));
-      Player::texture_player_atlas = LoadTextureFromImage(image_player_atlas);
-      UnloadImage(image_player_atlas);
+  if (!Player::resources_loaded)
+  {
+    // Load player texture
+    Image image_player_atlas = LoadImageFromMemory(".png", (unsigned char*)assets_raw.at(100), (int)asset_sizes.at(100));
+    Player::texture_player_atlas = LoadTextureFromImage(image_player_atlas);
+    UnloadImage(image_player_atlas);
 
-      Player::resources_loaded = true;
-    }
+    Player::resources_loaded = true;
+  }
 
-    this->scale = 5;
+  Player::players.push_back(this);
+
+  this->scale = 5;
+}
+
+Player::~Player()
+{
+  Player::players.erase(std::remove(Player::players.begin(), 
+                        Player::players.end(), this),
+                        Player::players.end());
 }
 
 void Player::on_update(float delta)
