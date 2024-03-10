@@ -1,3 +1,5 @@
+#include <cstdint>
+
 #include <gameobject.h>
 
 #include <components/health.h>
@@ -16,8 +18,8 @@ public:
     void on_render() override;
 
 private:
-    int frame = 0;
-    float anim_timer = 0.0f;
+    uint8_t anim_frame = 0;
+    float   anim_timer = 0.0f;
 
     static bool resources_loaded;
     static Texture texture_player_atlas;

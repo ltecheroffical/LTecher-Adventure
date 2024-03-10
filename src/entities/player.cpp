@@ -2,6 +2,7 @@
 #include <raymath.h>
 
 #include <asset_ids.h>
+#include <ltmath.h>
 
 #include <app.h>
 
@@ -13,19 +14,6 @@
 bool Player::resources_loaded = false;
 
 Texture Player::texture_player_atlas;
-
-int wrap(int value, int min, int max)
-{
-  if (value < min)
-  {
-    return max;
-  }
-  else if (value > max)
-  {
-    return min;
-  } 
-  return value;
-}
 
 Player::Player()
 {
@@ -61,19 +49,19 @@ void Player::on_update(float delta)
     {
       if (direction.y == -1)
       {
-        this->frame = wrap(this->frame + 1, 4, 5);
+        this->anim_frame = LTMath::wrap(this->anim_frame + 1, 4, 5);
       }
       else if (direction.y == 1)
       {
-        this->frame = wrap(this->frame + 1, 2, 3);
+        this->anim_frame = LTMath::wrap(this->anim_frame + 1, 2, 3);
       }
       else if (direction.x == -1)
       {
-        this->frame = wrap(this->frame + 1, 6, 7);
+        this->anim_frame = LTMath::wrap(this->anim_frame + 1, 6, 7);
       }
       else if (direction.x == 1)
       {
-        this->frame = wrap(this->frame + 1, 8, 9);
+        this->anim_frame = LTMath::wrap(this->anim_frame + 1, 8, 9);
       }
       this->anim_timer = 0.0f;
     }
@@ -83,8 +71,12 @@ void Player::on_update(float delta)
   }
   else if (this->anim_timer > 1.0f)
   {
-    this->frame = wrap(this->frame + 1, 0, 1);
+    this->anim_frame = LTMath::wrap(this->anim_frame + 1, 0, 1);
     this->anim_timer = 0.0f;
+  }
+  else if (this->anim_frame > 1)
+  {
+    this->anim_frame = 0;
   }
   this->health.damage(delta * 0.1f);
 }
@@ -96,7 +88,7 @@ void Player::on_render()
     BeginMode2D(game_camera);
     
     DrawTexturePro(Player::texture_player_atlas, 
-                   {16 * (float)this->frame, 0, 16, 16}, {0, 0, 16 * 1.2f * this->scale, 16 * this->scale},
+                   {16 * (float)this->anim_frame, 0, 16, 16}, {0, 0, 16 * 1.2f * this->scale, 16 * this->scale},
                 this->position, 0, WHITE);
     
     EndMode2D();
