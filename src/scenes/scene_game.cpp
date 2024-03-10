@@ -1,12 +1,16 @@
 #include <raylib.h>
 #include <raymath.h>
 
+#include <memory>
+
 #include <entities/player.h>
 #include <entities/camera.h>
 
 #include <gui/custom/heart_bar.h>
 
 #include <gui/screens/game_hud.h>
+
+#include <saving/game_save.h>
 
 #include <app.h>
 
@@ -15,6 +19,8 @@
 void GameScene::on_load()
 {
   this->screen->init();
+
+  GameSave::current_save = new GameSave((char*)"save.dat");
 
   auto obj_player = std::make_shared<Player>();
   auto obj_camera = std::make_shared<GameCamera>();

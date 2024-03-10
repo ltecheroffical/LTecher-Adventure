@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <iostream>
+#include <memory>
 #include <vector>
 
 #include <raylib.h>
@@ -13,21 +14,20 @@ GameSave *GameSave::current_save = nullptr;
 
 GameSave::GameSave(char *file_path)
 {
-  this->save_file.open(file_path, std::ios::out | std::ios::binary);
+  this->save_file.open(file_path, std::ios::out | std::ios::in | std::ios::binary);
 
   if (!this->save_file.is_open())
   {
-    throw("Save could not be opened!");
+    throw("Failed to open save file!");
   }
 
-  if (this->current_save == nullptr)
+  if (GameSave::current_save != nullptr)
   {
-    this->current_save = this;
+    throw("There is already a save file open!");
   }
-  else
-  {
-    throw("Cannot load more than one save!");
-  }
+  data.assign(std::istreambuf_iterator<char>(this->save_file),
+              std::istreambuf_iterator<char>());
+  GameSave::current_save = this;
 }
 
 GameSave::~GameSave()
@@ -48,44 +48,44 @@ void GameSave::save()
   uint8_t save_name_length = (uint8_t)this->save_name.length();
 
   this->data.resize(this->data.size() + sizeof(uint8_t));
-  char *save_name_length_bytes = reinterpret_cast<char*>(&save_name_length);
-  std::copy(save_name_length_bytes,
-            save_name_length_bytes + sizeof(uint8_t),
+  std::copy(reinterpret_cast<char*>(&save_name_length),
+            reinterpret_cast<char*>(&save_name_length) + sizeof(uint8_t),
             this->data.end() - sizeof(uint8_t));
   
   this->data.resize(this->data.size() + save_name_length);
   std::copy(save_name_c_str,
             save_name_c_str + save_name_length,
             this->data.end() - save_name_length);
+
+  this->data.resize(this->data.size() + sizeof(int));
+  std::copy(reinterpret_cast<char*>(&this->date_created),
+            reinterpret_cast<char*>(&this->date_created) + sizeof(int),
+            this->data.end() - sizeof(int));
   
   App::render_objects(Scene::get_current_scene()->get_children());
-  Image screenshot = LoadImageFromScreen();
-  int image_file_size = 0;
   
   int image_data_size = GetPixelDataSize(
-      screenshot.width,
-      screenshot.height,
+      this->save_screenshot.width,
+      this->save_screenshot.height,
       PIXELFORMAT_UNCOMPRESSED_R8G8B8A8);
 
   unsigned char *image_data_bytes = ExportImageToMemory(
-    screenshot,
+    this->save_screenshot,
     ".png",
     &image_data_size);
   
   std::vector<char> image_data(image_data_bytes, image_data_bytes + image_data_size);
 
-  int file_size = (int)image_data.size();
+  int image_file_size = (int)image_data.size();
   this->data.resize(this->data.size() + sizeof(int));
-  
-  char *image_size_bytes = reinterpret_cast<char*>(&file_size);
-  std::copy(image_size_bytes,
-             image_size_bytes + sizeof(int),
+  std::copy(reinterpret_cast<char*>(&image_file_size),
+            reinterpret_cast<char*>(&image_file_size) + sizeof(int),
             this->data.end() - sizeof(int));
   
-  this->data.resize(this->data.size() + file_size);
+  this->data.resize(this->data.size() + image_file_size);
   std::copy(image_data.begin(),
             image_data.end(),
-            this->data.end() - file_size);
+            this->data.end() - image_file_size);
 
   this->save_file.clear();
   for (int i = 0; i < this->data.size(); i++)

@@ -91,7 +91,6 @@ int main()
 	SetWindowIcon(LoadImageFromMemory(".png", (unsigned char*)assets_raw.at(0), asset_sizes.at(0)));
 #endif
 
-
 	constexpr float blank_splash_time = 1.5;
 	
 	float remaining_splash_time = 3.5;
@@ -143,9 +142,8 @@ int main()
 			if (Scene::is_scene_loaded())
 			{
 				update_objects(Scene::get_current_scene()->get_children());
-      App::render_objects(Scene::get_current_scene()->get_children());
-
         Scene::get_current_scene()->on_update(GetFrameTime());
+        App::render_objects(Scene::get_current_scene()->get_children());
         Scene::get_current_scene()->on_render();
 			} 
 		

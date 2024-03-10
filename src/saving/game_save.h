@@ -1,4 +1,5 @@
-#include <ctime>
+#include <raylib.h>
+
 #include <fstream>
 #include <string>
 #include <vector>
@@ -19,6 +20,8 @@ public:
   std::string save_name;
 
   int date_created = time(NULL);
+  
+  Image save_screenshot = LoadImageFromScreen();
 
   std::vector<Player*> players;
 

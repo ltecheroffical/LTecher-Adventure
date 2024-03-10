@@ -1,8 +1,10 @@
 #include <raylib.h>
 
 #include <ltmath.h>
+
 #include <app.h>
 #include <asset_ids.h>
+#include <saving/game_save.h>
 
 #include "pause.h"
 
@@ -24,8 +26,20 @@ PauseMenu::PauseMenu(Scene *scene) : Screen(scene)
   }
 
   // Fill out callbacks
-  this->menu_callbacks[0] = [&]() { this->paused = false; };
-  this->menu_callbacks[3] = [&]() { App::close(); };
+  this->menu_callbacks[0] = [&]() {
+    this->paused = false;
+  };
+  this->menu_callbacks[1] = [&]() {
+    GameSave::current_save->save();
+    this->paused = false;
+  };
+  this->menu_callbacks[2] = [&]() {
+    GameSave::current_save->save();
+    App::close();
+  };
+  this->menu_callbacks[3] = [&]() {
+    App::close();
+  };
 }
 
 void PauseMenu::update(float delta)
@@ -82,9 +96,12 @@ void PauseMenu::render()
   for (int i = 0; i < this->menu_options.size(); i++)
   {
     const char *option = this->menu_options.at(i).c_str();
+    
+    int font_size = (GetScreenWidth() + GetScreenHeight()) / 75;
+
     DrawTextEx(PauseMenu::inventory_font, option,
-               {((float)GetScreenWidth() - MeasureText(option, 16)) / 2,
-                ((float)GetScreenHeight() / 2.5f + (i * 16)) - 4.5f}, 16, 2, (this->selected == i) ? GREEN : WHITE);
+               {((float)GetScreenWidth() - MeasureText(option, font_size)) / 2,
+                ((float)GetScreenHeight() / 2.5f + (i * font_size)) - 4.5f}, font_size, 2, (this->selected == i) ? GREEN : WHITE);
   }
 
   if (IsKeyPressed(KEY_ENTER))
