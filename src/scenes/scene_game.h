@@ -13,4 +13,5 @@ public:
 
   void on_load() override;
   void on_update(float delta) override;
+  void on_render() override;
 };

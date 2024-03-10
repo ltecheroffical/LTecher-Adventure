@@ -61,6 +61,10 @@ public:
     */
     virtual void on_update(float delta) { /* Override to listen to event */ };
     /*
+    * Called every frame when the scene can render extra graphics
+    */
+    virtual void on_render() { /* Override to listen to event */ };
+    /*
     * Called when the scene is unloaded
     */
     virtual void on_unload() { /* Override to listen to event */ };

@@ -15,11 +15,13 @@
 GameHUD::GameHUD(Scene *scene) : Screen(scene)
 {
   this->inventory = new Inventory(scene);
+  this->pause_menu = new PauseMenu(scene);
 }
 
 GameHUD::~GameHUD()
 {
   delete this->inventory;
+  delete this->pause_menu;
 }
 
 void GameHUD::init()
@@ -54,10 +56,16 @@ void GameHUD::update(float delta)
 
   obj_health_bar->position.y = panel_pos.y + (((panel_size.y - obj_health_bar->size.y) / 2) - 9.0f);
   
+  this->pause_menu->update(delta);
   this->inventory->update(delta);
 }
 
 void GameHUD::render()
 {
+  if (this->pause_menu->paused)
+  {
+    this->pause_menu->render();
+    return;
+  }
   this->inventory->render();
 }

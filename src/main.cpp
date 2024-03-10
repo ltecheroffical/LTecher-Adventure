@@ -102,6 +102,8 @@ int main()
 
 	SetTargetFPS(60); // -1 Will disable frame cap
 
+  SetExitKey(KEY_NULL);
+
   try
   {
     load_assets((char*)RESOURCES_PATH);
@@ -170,6 +172,7 @@ int main()
 				update_objects(Scene::get_current_scene()->get_children());
         Scene::get_current_scene()->on_update(GetFrameTime());
 				render_objects(Scene::get_current_scene()->get_children());
+        Scene::get_current_scene()->on_render();
 			} 
 		
 		if (!CLRCMP(App::screen_tint, WHITE))

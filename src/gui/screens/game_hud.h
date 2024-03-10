@@ -5,6 +5,7 @@
 #include "screen.h"
 
 #include "popouts/inventory.h"
+#include "popouts/pause.h"
 
 #pragma once
 
@@ -20,4 +21,5 @@ public:
 
 private:
   Inventory *inventory;
+  PauseMenu *pause_menu;
 };

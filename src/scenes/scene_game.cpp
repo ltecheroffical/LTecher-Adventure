@@ -41,6 +41,9 @@ void GameScene::on_update(float delta)
   obj_camera->position = obj_player->position;
 
   obj_health_bar->health = obj_player->health;
+}
 
+void GameScene::on_render()
+{
   this->screen->render();
 }
