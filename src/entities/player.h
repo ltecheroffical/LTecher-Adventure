@@ -3,6 +3,7 @@
 #include <gameobject.h>
 
 #include <components/health.h>
+#include <vector>
 
 #pragma once
 
@@ -10,12 +11,14 @@ class Player : public GameObject
 {
 public:
     Player();
-    ~Player() override = default;
+    ~Player() override;
 
     Health health = Health(10);
 
     void on_update(float delta) override;
     void on_render() override;
+
+    static std::vector<Player*> players;
 
 private:
     uint8_t anim_frame = 0;

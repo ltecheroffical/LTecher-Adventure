@@ -3,6 +3,9 @@
 
 #include <raylib.h>
 
+#include <gameobject.h>
+#include <scene.h>
+
 #include <plugin.h>
 
 #pragma once
@@ -27,4 +30,6 @@ public:
 
     inline static void close() { App::running = false; };
     inline static bool is_running()  { return App::running; };
+
+    static void render_objects(const std::vector<std::shared_ptr<GameObject>> *objects);
 };
