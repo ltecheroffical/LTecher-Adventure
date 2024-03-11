@@ -108,10 +108,9 @@ void GameSave::save()
     float health_value = health.get_health();
     float health_max = health.get_max();
 
-    int player_size = 0;
+    unsigned int player_size = 0;
 
     player_data.resize(player_data.size() + sizeof(int));
-    auto player_size_start = player_data.end() - sizeof(int);
 
     player_data.resize(player_data.size() + sizeof(int));
     player_size += sizeof(int);
@@ -140,7 +139,7 @@ void GameSave::save()
     
     std::copy(reinterpret_cast<char*>(&player_size),
               reinterpret_cast<char*>(&player_size) + sizeof(int),
-              player_size_start);
+              player_data.end() - player_size - sizeof(int));
   }
 
   int player_data_size = (int)player_data.size();
