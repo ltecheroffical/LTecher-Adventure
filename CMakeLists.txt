@@ -2,10 +2,6 @@ cmake_minimum_required(VERSION 3.16)
 
 project(ltecher_adventure)
 
-if (MSVC)
-  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDebug$<$<CONFIG:Debug>:Debug>")
-endif()
-
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(thirdparty/raylib)				# Game Engine

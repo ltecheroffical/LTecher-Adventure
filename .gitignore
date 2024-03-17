@@ -2,6 +2,9 @@
 build/
 gameassets.ltassets
 
+# Clang
+.cache/
+
 # Neovim
 compile_commands.json
 build_project.sh
@@ -18,5 +21,6 @@ run_project.sh
 TODO.txt
 save.dat
 
+# ExFat
 **/._*.*
 **/._*
