@@ -106,9 +106,7 @@ int main()
 	Texture splash_texture = LoadTextureFromImage(splash_image);
   UnloadImage(splash_image);
 	
-#if PRODUCTION_BUILD == 0
 	App::load_plugin(std::make_shared<Debugger>());
-#endif
 	
 	for (std::shared_ptr<Plugin> extension : *App::get_loaded_plugins())
 	{

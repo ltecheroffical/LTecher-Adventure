@@ -1,5 +1,4 @@
 #include <optional>
-#include <stdexcept>
 #include <memory>
 
 #include "scene.h"

@@ -16,19 +16,14 @@ GameSave *GameSave::current_save = nullptr;
 
 GameSave::GameSave(char *file_path)
 {
-  this->save_file.open(file_path, std::ios::out | std::ios::in | std::ios::binary);
-
-  if (!this->save_file.is_open())
-  {
-    throw("Failed to open save file!");
-  }
+  this->save_file.open(file_path, std::ios::out | std::ios::in);
 
   if (GameSave::current_save != nullptr)
   {
     throw("There is already a save file open!");
   }
   data.assign(std::istreambuf_iterator<char>(this->save_file),
-              std::istreambuf_iterator<char>());
+             std::istreambuf_iterator<char>());
   GameSave::current_save = this;
 }
 
