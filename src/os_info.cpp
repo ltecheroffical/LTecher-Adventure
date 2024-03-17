@@ -60,5 +60,10 @@ const char *OS::get_version()
 #else
   #define OS_VERSION "" 
 #endif
+  
+#ifdef WIN32
+  return OS_VERSION;
+#else
   return OS_VERSION.c_str();
+#endif
 }

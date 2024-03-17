@@ -36,9 +36,11 @@ Player::Player()
 
 Player::~Player()
 {
+#ifndef WIN32
   Player::players.erase(std::remove(Player::players.begin(), 
                         Player::players.end(), this),
                         Player::players.end());
+#endif
 }
 
 void Player::on_update(float delta)

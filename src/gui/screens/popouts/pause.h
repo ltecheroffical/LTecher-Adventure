@@ -3,6 +3,10 @@
 
 #include <raylib.h>
 
+#ifdef WIN32
+#include <functional>
+#endif
+
 #include "../screen.h"
 
 #pragma once
