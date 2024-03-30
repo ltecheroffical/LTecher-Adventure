@@ -31,6 +31,14 @@ void HeartBar::on_render()
   {
       health_hearts = (int)std::roundf(cur_health);
   }
+  else if (cur_health <= 0)
+  {
+      health_hearts = 0;
+  }
+  else 
+  {
+      health_hearts = 1;
+  }
   
   for (int i = 0; i < 10; i++)
   {

@@ -11,5 +11,8 @@ public:
   ~Inventory() override = default;
 
   void render() override;
-  void update(float delta) override {};
+  void update(float delta) override;
+
+private:
+  bool visible = false;
 };

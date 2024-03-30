@@ -4,8 +4,11 @@ project(ltecher_adventure)
 
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
-add_subdirectory(thirdparty/raylib)				# Game Engine
+# Libraries
+add_subdirectory(thirdparty/raylib)				        # Game Engine
+add_subdirectory(thirdparty/imgui)        				# GUI
 
+# Sources
 file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 
@@ -13,6 +16,7 @@ add_executable("${CMAKE_PROJECT_NAME}")
 
 set_property(TARGET "${CMAKE_PROJECT_NAME}" PROPERTY CXX_STANDARD 20)
 
+# Assets
 set(RESOURCES_FILE "gameassets.ltassets")
 
 option(
@@ -20,6 +24,7 @@ option(
   "Sets if the path is hardcoded into the binary on debug mode.\n
     Useful when building to other platforms and testing" ON)
 
+# Set build type
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
   target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC PRODUCTION_BUILD=1)
 else()
@@ -34,6 +39,8 @@ endif()
 
 target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES})
 
+
+# Bundle (MacOS only)
 if (APPLE)
   add_custom_target(bundle)
   add_custom_command(TARGET bundle
@@ -64,6 +71,7 @@ if (APPLE)
   )
 endif()
 
+# MSVC config
 if(MSVC)
 	target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC _CRT_SECURE_NO_WARNINGS)
 
@@ -73,9 +81,11 @@ if(MSVC)
 	set_property(TARGET "${CMAKE_PROJECT_NAME}" PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:Release>")
 endif()
 
+# Linking
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/")
 
 target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE 
   raylib
+  imgui
 )

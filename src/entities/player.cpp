@@ -4,9 +4,12 @@
 #include <asset_ids.h>
 #include <ltmath.h>
 
+#include <imgui.h>
+
 #include <app.h>
 
 #include "camera.h"
+#include "imgui.h"
 
 #include "player.h"
 
@@ -105,4 +108,13 @@ void Player::on_render()
                 this->position, 0, WHITE);
     
     EndMode2D();
+
+#if PRODUCTION_BUILD == 0
+    ImGui::Begin("Player", NULL, 0);
+
+    ImGui::InputFloat2("Position", &this->position.x);
+    ImGui::InputFloat("Health", &this->health.health, 0.1f, 0.5f);
+
+    ImGui::End();
+  #endif
 }

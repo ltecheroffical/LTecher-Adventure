@@ -156,4 +156,6 @@ void GameSave::save()
     this->save_file << this->data[i];
   }
   this->save_file.flush();
+
+  this->on_save.emit();
 }

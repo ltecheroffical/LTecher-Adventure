@@ -7,6 +7,9 @@ public:
     Health(float max, float inital);
     ~Health() = default;
 
+    float health;
+    float max_health;
+
     /*
     * Sets the current health
     *
@@ -54,8 +57,4 @@ public:
     * @returns A bool that tracks if health is zero
     */
     bool is_dead();
-
-private:
-    float health;
-    float max_health;
 };

@@ -20,6 +20,5 @@ public:
 
 private:
     static bool resources_loaded;
-
     static Texture texture_health_atlas;
 };

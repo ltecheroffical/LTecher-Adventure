@@ -33,6 +33,7 @@ PauseMenu::PauseMenu(Scene *scene) : Screen(scene)
   };
   this->menu_callbacks[1] = [&]() {
     GameSave::current_save->players = Player::players;
+    GameSave::current_save->save_screenshot = LoadImageFromScreen();
     GameSave::current_save->save();
     this->paused = false;
   };

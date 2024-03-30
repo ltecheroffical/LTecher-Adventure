@@ -1,8 +1,14 @@
+#include "GLFW/glfw3.h"
 #include <iostream>
 #include <vector>
 #include <filesystem>
 
 #include <raylib.h>
+
+#include <imgui.h>
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
+
 #include <asset_ids.h>
 
 #include <gameobject.h>
@@ -60,12 +66,14 @@ float process_splash(float splash_time_passed, float blank_splash_time, Texture 
 
 int main()
 {
+  // Resources check
 	if (!std::filesystem::exists(RESOURCES_PATH))
 	{
 		std::cerr << "ERROR: FATAL: RESOURCES NOT FOUND!" << std::endl;
 		return 1;
 	} 
-	
+
+  // Init
 	InitWindow(App::DEFAULT_SCREEN_WIDTH, App::DEFAULT_SCREEN_HEIGHT, "LTecher Adventure");
 
 	SetWindowState(FLAG_WINDOW_RESIZABLE);
@@ -77,6 +85,14 @@ int main()
 
   SetExitKey(KEY_NULL);
 
+  // ImGUI
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+
+  ImGui_ImplGlfw_InitForOpenGL(glfwGetCurrentContext(), true);
+  ImGui_ImplOpenGL3_Init();
+
+  // Assets
   try
   {
     load_assets((char*)RESOURCES_PATH);
@@ -84,13 +100,16 @@ int main()
   catch (char *error_message)
   {
     std::cerr << "ERROR: FATAL: RESOURCES COULD NOT LOAD! " << error_message << std::endl;
+    CloseWindow();
     return 1;
   }
 
+  // Windows users
 #ifdef WIN32
 	SetWindowIcon(LoadImageFromMemory(".png", (unsigned char*)assets_raw.at(0), asset_sizes.at(0)));
 #endif
-
+  
+  // Splash
 	constexpr float blank_splash_time = 1.5;
 	
 	float remaining_splash_time = 3.5;
@@ -106,6 +125,7 @@ int main()
 	Texture splash_texture = LoadTextureFromImage(splash_image);
   UnloadImage(splash_image);
 	
+  // Plugins
 	App::load_plugin(std::make_shared<Debugger>());
 	
 	for (std::shared_ptr<Plugin> extension : *App::get_loaded_plugins())
@@ -113,6 +133,8 @@ int main()
 		extension.get()->on_game_start();
 	}
 
+  
+  // Main Loop
 	while (!WindowShouldClose() && App::is_running())
 	{
 		if (remaining_splash_time > 0)
@@ -135,9 +157,13 @@ int main()
 		}
 
 		BeginDrawing();
-			ClearBackground({0, 255, 255, 255});
+      ClearBackground({0, 255, 255, 255});
 
-			if (Scene::is_scene_loaded())
+      ImGui_ImplOpenGL3_NewFrame();
+      ImGui_ImplGlfw_NewFrame();
+      ImGui::NewFrame();
+
+      if (Scene::is_scene_loaded())
 			{
 				update_objects(Scene::get_current_scene()->get_children());
         Scene::get_current_scene()->on_update(GetFrameTime());
@@ -145,12 +171,20 @@ int main()
         Scene::get_current_scene()->on_render();
 			} 
 		
-		if (!CLRCMP(App::screen_tint, WHITE))
-		{
-			DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(App::screen_tint, 0.2f));
-		}
+		  if (!CLRCMP(App::screen_tint, WHITE))
+		  {
+			  DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(App::screen_tint, 0.2f));
+		  }
+
+      ImGui::Render();
+      ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		EndDrawing();
+
 	}
+
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplGlfw_Shutdown();
+  ImGui::DestroyContext();
 
 	CloseAudioDevice();
 	CloseWindow();

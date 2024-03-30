@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include <event.h>
+
 #include <entities/player.h>
 
 #pragma once
@@ -13,6 +15,8 @@ class GameSave
 public:
   GameSave(char *file_path);
   ~GameSave();
+
+  Event<> on_save;
 
   void save();
   void load();

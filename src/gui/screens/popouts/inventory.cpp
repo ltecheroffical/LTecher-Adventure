@@ -13,8 +13,21 @@ Inventory::Inventory(Scene *scene) : Screen(scene)
   
 }
 
+void Inventory::update(float delta)
+{
+  if (IsKeyPressed(KEY_E))
+  {
+    this->visible = !this->visible;
+  }
+}
+
 void Inventory::render()
 {
+  if (!visible)
+  {
+    return;
+  }
+
   // Draw a square with color #3F3F74
   const Rectangle inventory_rect = {(float)GetScreenWidth() / 25, (float)GetScreenHeight() / 16,
                               (float)GetScreenWidth() / 2.5f, (float)GetScreenHeight() / 1.2f};
