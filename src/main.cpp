@@ -1,4 +1,5 @@
 #include "GLFW/glfw3.h"
+#include "raylib.h"
 #include <iostream>
 #include <vector>
 #include <filesystem>
@@ -66,12 +67,19 @@ float process_splash(float splash_time_passed, float blank_splash_time, Texture 
 
 int main()
 {
+  bool game_checks_successful = false;
+  std::string error_message;
+
   // Resources check
 	if (!std::filesystem::exists(RESOURCES_PATH))
 	{
-		std::cerr << "ERROR: FATAL: RESOURCES NOT FOUND!" << std::endl;
-		return 1;
-	} 
+    std::cerr << "ERROR: FATAL: RESOURCES NOT FOUND!" << std::endl;
+    error_message = "ERR_RESOURCES_NOT_FOUND";
+  }
+  else
+  {
+    game_checks_successful = true;
+  }
 
   // Init
 	InitWindow(App::DEFAULT_SCREEN_WIDTH, App::DEFAULT_SCREEN_HEIGHT, "LTecher Adventure");
@@ -116,15 +124,24 @@ int main()
 
 	bool splash_fx_played = false;
 	bool splash_unloaded = false;
-  
-  Wave  fx_splash_wave   = LoadWaveFromMemory(".wav", (unsigned char*)assets_raw.at(10), asset_sizes.at(10));
-	Sound fx_splash        = LoadSoundFromWave(fx_splash_wave);
-  UnloadWave(fx_splash_wave);
 
-  Image   splash_image   = LoadImageFromMemory(".png", (unsigned char*)assets_raw.at(2), asset_sizes.at(2));
-	Texture splash_texture = LoadTextureFromImage(splash_image);
-  UnloadImage(splash_image);
-	
+  Sound   fx_splash = {};
+  Texture splash_texture = {};
+  try
+  {
+    Wave fx_splash_wave = LoadWaveFromMemory(".wav", (unsigned char*)assets_raw.at(10), asset_sizes.at(10));
+    fx_splash = LoadSoundFromWave(fx_splash_wave);
+    UnloadWave(fx_splash_wave);
+
+    Image splash_image = LoadImageFromMemory(".png", (unsigned char*)assets_raw.at(2), asset_sizes.at(2));
+    splash_texture = LoadTextureFromImage(splash_image);
+    UnloadImage(splash_image);
+  }
+  catch (std::exception &error)
+  {
+
+  }
+
   // Plugins
 	App::load_plugin(std::make_shared<Debugger>());
 	
@@ -133,11 +150,35 @@ int main()
 		extension.get()->on_game_start();
 	}
 
-  
   // Main Loop
 	while (!WindowShouldClose() && App::is_running())
-	{
-		if (remaining_splash_time > 0)
+	{	
+    if (!game_checks_successful)
+    {
+      BeginDrawing();
+      ClearBackground({100, 100, 100, 255});
+      ImGui_ImplOpenGL3_NewFrame();
+      ImGui_ImplGlfw_NewFrame();
+      ImGui::NewFrame();
+
+      ImGui::Begin("LTecher Adventure - Error");
+
+      ImGui::Text("Cannot load the game due to an error:\n\n Code: %s", error_message.c_str());
+      if (ImGui::Button("Exit"))
+      {
+        App::close();
+      }
+
+      ImGui::End();
+
+      ImGui::Render();
+      ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+      EndDrawing();
+
+      continue;
+    }
+
+    if (remaining_splash_time > 0)
 		{
 			if (remaining_splash_time < blank_splash_time && !splash_fx_played)
 			{
