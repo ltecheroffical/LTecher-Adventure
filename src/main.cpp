@@ -1,14 +1,21 @@
-#include "GLFW/glfw3.h"
-#include "raylib.h"
+#include <cstdio>
 #include <iostream>
 #include <vector>
 #include <filesystem>
 
-#include <raylib.h>
+#if PRODUCTION_BUILD == 1
+  #define REMOVE_IMGUI
+#endif
 
+#include <raylib.h>
+#include <GLFW/glfw3.h>
+#include <tinyfiledialogs.h>
+
+#ifndef REMOVE_IMGUI
 #include <imgui.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
+#endif
 
 #include <asset_ids.h>
 
@@ -94,11 +101,13 @@ int main()
   SetExitKey(KEY_NULL);
 
   // ImGUI
+#ifndef REMOVE_IMGUI
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
 
   ImGui_ImplGlfw_InitForOpenGL(glfwGetCurrentContext(), true);
   ImGui_ImplOpenGL3_Init();
+#endif
 
   // Assets
   try
@@ -141,7 +150,7 @@ int main()
   {
 
   }
-
+  
   // Plugins
 	App::load_plugin(std::make_shared<Debugger>());
 	
@@ -157,13 +166,20 @@ int main()
     {
       BeginDrawing();
       ClearBackground({100, 100, 100, 255});
+
+      std::string message_text = "";
+
+      message_text.append("Cannot load the game due to an error:\n\n Code: ");
+      message_text.append(error_message.c_str());
+
+  #ifndef REMOVE_IMGUI
       ImGui_ImplOpenGL3_NewFrame();
       ImGui_ImplGlfw_NewFrame();
       ImGui::NewFrame();
 
       ImGui::Begin("LTecher Adventure - Error");
 
-      ImGui::Text("Cannot load the game due to an error:\n\n Code: %s", error_message.c_str());
+      ImGui::Text(message_text.c_str());
       if (ImGui::Button("Exit"))
       {
         App::close();
@@ -173,7 +189,16 @@ int main()
 
       ImGui::Render();
       ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+#endif
       EndDrawing();
+      
+#ifdef REMOVE_IMGUI
+      if (tinyfd_messageBox("LTecher Adventure - Error", message_text.c_str(), "ok", "error", 1))
+      {
+        App::close();
+      }
+#endif
+
 
       continue;
     }
@@ -200,9 +225,11 @@ int main()
 		BeginDrawing();
       ClearBackground({0, 255, 255, 255});
 
+#ifndef REMOVE_IMGUI
       ImGui_ImplOpenGL3_NewFrame();
       ImGui_ImplGlfw_NewFrame();
       ImGui::NewFrame();
+#endif
 
       if (Scene::is_scene_loaded())
 			{
@@ -217,15 +244,20 @@ int main()
 			  DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(App::screen_tint, 0.2f));
 		  }
 
+#ifndef REMOVE_IMGUI
       ImGui::Render();
       ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+#endif
+
 		EndDrawing();
 
 	}
 
+#ifndef REMOVE_IMGUI
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
+#endif
 
 	CloseAudioDevice();
 	CloseWindow();

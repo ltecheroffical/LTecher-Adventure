@@ -4,12 +4,13 @@
 #include <asset_ids.h>
 #include <ltmath.h>
 
+#ifndef REMOVE_IMGUI
 #include <imgui.h>
+#endif
 
 #include <app.h>
 
 #include "camera.h"
-#include "imgui.h"
 
 #include "player.h"
 
@@ -109,7 +110,7 @@ void Player::on_render()
     
     EndMode2D();
 
-#if PRODUCTION_BUILD == 0
+#ifndef REMOVE_IMGUI
     ImGui::Begin("Player", NULL, 0);
 
     ImGui::InputFloat2("Position", &this->position.x);

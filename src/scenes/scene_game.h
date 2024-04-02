@@ -8,7 +8,7 @@ class GameScene : public Scene
 private:
   GameHUD *screen = new GameHUD(this);
 
-#if PRODUCTION_BUILD == 0
+#ifndef REMOVE_IMGUI
   Texture2D save_screenshot;
   bool show_screenshot = false;
 #endif
