@@ -69,7 +69,7 @@ void GameScene::on_render()
 {
   this->screen->render();
   
-#if REMOVE_IMGUI
+#ifndef REMOVE_IMGUI
   ImGui::Begin("Save Data", NULL, 0);
 
   ImGui::InputText("Save Name", (char*)GameSave::current_save->save_name.c_str(), 256);

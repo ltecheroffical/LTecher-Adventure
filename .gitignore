@@ -20,6 +20,7 @@ run_project.sh
 # Msic.
 TODO.txt
 save.dat
+imgui.ini
 
 # ExFat
 **/._*.*

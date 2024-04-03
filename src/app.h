@@ -3,6 +3,8 @@
 
 #include <raylib.h>
 
+#include <event.h>
+
 #include <gameobject.h>
 #include <scene.h>
 
@@ -20,6 +22,9 @@ private:
 
 
 public:
+    static Event<float> on_update;
+    static Event<> on_render;
+
     static const int DEFAULT_SCREEN_WIDTH = 800;
     static const int DEFAULT_SCREEN_HEIGHT = 450;
 

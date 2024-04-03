@@ -1,4 +1,4 @@
-#include <cstdio>
+#include "tick_system.h"
 #include <iostream>
 #include <vector>
 #include <filesystem>
@@ -96,7 +96,9 @@ int main()
 
 	InitAudioDevice();
 
+  // Timing
 	SetTargetFPS(60); // -1 Will disable frame cap
+  TickSystem& tick_system = TickSystem::singleton();
 
   SetExitKey(KEY_NULL);
 
@@ -148,7 +150,7 @@ int main()
   }
   catch (std::exception &error)
   {
-
+    std::cerr << "ERROR: SPLASH COULD NOT LOAD! " << error.what() << std::endl;
   }
   
   // Plugins
@@ -179,7 +181,7 @@ int main()
 
       ImGui::Begin("LTecher Adventure - Error");
 
-      ImGui::Text(message_text.c_str());
+      ImGui::Text("%s", message_text.c_str());
       if (ImGui::Button("Exit"))
       {
         App::close();
@@ -233,8 +235,11 @@ int main()
 
       if (Scene::is_scene_loaded())
 			{
+        App::on_update.emit(GetFrameTime());
 				update_objects(Scene::get_current_scene()->get_children());
         Scene::get_current_scene()->on_update(GetFrameTime());
+
+        App::on_render.emit();
         App::render_objects(Scene::get_current_scene()->get_children());
         Scene::get_current_scene()->on_render();
 			} 
