@@ -3,7 +3,8 @@
 #include "tick_system.h"
 
 TickSystem::TickSystem()
-{  App::on_update.subscribe([this](float delta) {
+{
+  App::singleton().on_update.subscribe([this](float delta) {
     if (this->tick_time >= 0.25f)
     {
       this->ticks++;

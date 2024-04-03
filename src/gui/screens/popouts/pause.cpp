@@ -40,10 +40,10 @@ PauseMenu::PauseMenu(Scene *scene) : Screen(scene)
   this->menu_callbacks[2] = [&]() {
     GameSave::current_save->players = Player::players;
     GameSave::current_save->save();
-    App::close();
+    App::singleton().close();
   };
   this->menu_callbacks[3] = [&]() {
-    App::close();
+    App::singleton().close();
   };
 }
 

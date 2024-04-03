@@ -18,15 +18,16 @@ class AtariRandomHandler
   private:
     inline AtariRandomHandler() {
       // Initialize bits
-      for (int i = 0; i < 17; i++)
+      for (int i = 0; i < 18; i++)
       {
         // Use the current time as the starting bits
         this->bits.push_back(std::chrono::system_clock::now().time_since_epoch().count() % 2 == 0);
       }
 
-      App::on_update.subscribe([this](float delta) {
+      App::singleton().on_update.subscribe([this](float delta) {
         // Update atari random
-        this->bits.push_back(this->bits[0] != this->bits[1]);
+        int index_end = this->bits.size();
+        this->bits.push_back(this->bits[index_end - 8] != this->bits[index_end]);
         this->bits.erase(this->bits.begin());
       });
     };
@@ -42,6 +43,5 @@ char Random::char_atari()
   {
     random_number |= (atari_random.bits[i] << i);
   }
-  printf("%d\n", random_number);
   return random_number;
 }

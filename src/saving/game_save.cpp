@@ -62,8 +62,6 @@ void GameSave::save()
             reinterpret_cast<char*>(&this->date_created) + sizeof(int),
             this->data.end() - sizeof(int));
   
-  App::render_objects(Scene::get_current_scene()->get_children());
-  
   int image_data_size = GetPixelDataSize(
       this->save_screenshot.width,
       this->save_screenshot.height,

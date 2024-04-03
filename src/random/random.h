@@ -22,6 +22,7 @@ namespace Random
    */
   float float_urandom();
 
+
   /*
    * Returns a random number from /dev/random as a 4 byte integer (unix only, should be used for secure randomness)
    */
@@ -35,8 +36,23 @@ namespace Random
    */
   float float_random();
 
+
   /*
    * Returns a random number from a 17 bit row of bits as 1 byte (method used on atari's poki chips)
    */
   char char_atari();
+
+
+  /*
+   * Returns a random number from the current time in seconds from the epoch (1937-01-01 00:00:00 UTC) as a 4 byte integer
+   */
+  int int_timerandom();
+  /*
+   * Returns a random number from the current time in seconds from the epoch (1937-01-01 00:00:00 UTC) as 1 byte
+   */
+  char char_timerandom();
+  /*
+   * Returns a random number from the current time in seconds from the epoch (1937-01-01 00:00:00 UTC) as a 4 byte float
+   */
+  float float_timerandom();
 }

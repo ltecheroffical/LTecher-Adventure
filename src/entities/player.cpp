@@ -31,7 +31,7 @@ Player::Player()
     Player::texture_player_atlas = LoadTextureFromImage(image_player_atlas);
     UnloadImage(image_player_atlas);
 
-    App::on_close.subscribe([this](){
+    App::singleton().on_close.subscribe([this](){
       UnloadTexture(this->texture_player_atlas);
     });
   

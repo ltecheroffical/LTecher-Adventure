@@ -41,7 +41,7 @@ void update_objects(const std::vector<std::shared_ptr<GameObject>> *objects)
 		object->on_update(GetFrameTime());
 	}
 
-	for (std::shared_ptr<Plugin> extension : *App::get_loaded_plugins())
+	for (std::shared_ptr<Plugin> extension : *App::singleton().get_loaded_plugins())
 	{
 		extension.get()->on_update(GetFrameTime());
 	}
@@ -156,9 +156,9 @@ int main()
   }
   
   // Plugins
-	App::load_plugin(std::make_shared<Debugger>());
+	App::singleton().load_plugin(std::make_shared<Debugger>());
 	
-	for (std::shared_ptr<Plugin> extension : *App::get_loaded_plugins())
+	for (std::shared_ptr<Plugin> extension : *App::singleton().get_loaded_plugins())
 	{
 		extension.get()->on_game_start();
 	}
@@ -170,12 +170,12 @@ int main()
     message_text.append(error_message.c_str());
     if (tinyfd_messageBox("LTecher Adventure - Error", message_text.c_str(), "ok", "error", 1))
     {
-      App::close();
+      App::singleton().close();
     }
   }
 
   // Main Loop
-	while (!WindowShouldClose() && App::is_running())
+	while (!WindowShouldClose() && App::singleton().is_running())
 	{	
     if (remaining_splash_time > 0)
     {
@@ -206,18 +206,18 @@ int main()
 #endif  
       if (Scene::is_scene_loaded())
 			{
-        App::on_update.emit(GetFrameTime());
+        App::singleton().on_update.emit(GetFrameTime());
 				update_objects(Scene::get_current_scene()->get_children());
         Scene::get_current_scene()->on_update(GetFrameTime());
 
-        App::on_render.emit();
-        App::render_objects(Scene::get_current_scene()->get_children());
+        App::singleton().on_render.emit();
+        App::singleton().render_objects(Scene::get_current_scene()->get_children());
         Scene::get_current_scene()->on_render();
 			}
 
-		  if (!CLRCMP(App::screen_tint, WHITE))
+		  if (!CLRCMP(App::singleton().screen_tint, WHITE))
 		  {
-			  DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(App::screen_tint, 0.2f));
+			  DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(App::singleton().screen_tint, 0.2f));
 		  }
 
 #ifndef REMOVE_IMGUI
@@ -227,7 +227,7 @@ int main()
 		EndDrawing();
 	}
 
-  App::on_close.emit();
+  App::singleton().on_close.emit();
   unload_assets();
 
 #ifndef REMOVE_IMGUI

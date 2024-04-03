@@ -5,7 +5,6 @@
 #include <memory>
 
 #include <gameobject.h>
-#include <random/random.h>
 
 #pragma once
 
@@ -85,19 +84,7 @@ public:
    * @param object The object to add
    * @param id The id of the object (if value is `OBJ_ID_NONE` it will be added as a random id)
    */
-  inline void add_child(std::shared_ptr<GameObject> object, int id) {
-    this->objects.push_back(object);
-    object.get()->on_start();
-
-    if (id != Scene::OBJ_ID_NONE)
-    {
-      object_map.try_emplace(id, object);
-    }
-    else
-    {
-      object_map.try_emplace(Random::int_urandom(), object);
-    }
-  };
+  void add_child(std::shared_ptr<GameObject> object, int id);
 
   inline std::shared_ptr<GameObject> get_child(int id) {
     if (!object_map.contains(id))

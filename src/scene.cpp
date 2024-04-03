@@ -1,6 +1,8 @@
 #include <optional>
 #include <memory>
 
+#include <random/random.h>
+
 #include "scene.h"
 
 std::optional<std::shared_ptr<Scene>> Scene::current_scene = std::nullopt;
@@ -35,4 +37,19 @@ void Scene::unload_current_scene()
 
     Scene::current_scene.value()->on_unload();
     Scene::current_scene = std::nullopt;
+}
+
+void Scene::add_child(std::shared_ptr<GameObject> object, int id)
+{
+  this->objects.push_back(object);
+  object.get()->on_start();
+
+  if (id != Scene::OBJ_ID_NONE)
+  {
+    this->object_map.try_emplace(id, object);
+  }
+  else
+  {
+    this->object_map.try_emplace(Random::int_urandom(), object);
+  }
 }

@@ -21,7 +21,7 @@ HeartBar::HeartBar()
     texture_health_atlas = LoadTextureFromImage(image_heart_atlas);
     UnloadImage(image_heart_atlas);
     
-    App::on_close.subscribe([this]() {
+    App::singleton().on_close.subscribe([this]() {
       UnloadTexture(HeartBar::texture_health_atlas);
     });
 

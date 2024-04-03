@@ -16,27 +16,36 @@
 
 class App
 {
-private:
-    static bool running;
-    static vec<std::shared_ptr<Plugin>> plugins;
+  public:
+    static App& singleton()
+    {
+      static App instance;
+      return instance;
+    }
+
+    static constexpr int DEFAULT_SCREEN_WIDTH = 800;
+    static constexpr int DEFAULT_SCREEN_HEIGHT = 450;
+
+    Event<float> on_update;
+    Event<> on_render;
+
+    Event<> on_close;
 
 
-public:
-    static Event<float> on_update;
-    static Event<> on_render;
+    Color screen_tint;
 
-    static Event<> on_close;
+    inline void load_plugin(std::shared_ptr<Plugin> plugins) { this->plugins.push_back(plugins); };
+    inline vec<std::shared_ptr<Plugin>> *get_loaded_plugins() { return &this->plugins; };
 
-    static const int DEFAULT_SCREEN_WIDTH = 800;
-    static const int DEFAULT_SCREEN_HEIGHT = 450;
+    inline void close() { App::running = false; };
+    inline bool is_running()  { return App::running; };
 
-    static Color screen_tint;
+    void render_objects(const std::vector<std::shared_ptr<GameObject>> *objects);
 
-    inline static void load_plugin(std::shared_ptr<Plugin> plugins) { App::plugins.push_back(plugins); };
-    inline static vec<std::shared_ptr<Plugin>> *get_loaded_plugins() { return &App::plugins; };
 
-    inline static void close() { App::running = false; };
-    inline static bool is_running()  { return App::running; };
+  private:
+    App();
 
-    static void render_objects(const std::vector<std::shared_ptr<GameObject>> *objects);
+    bool running;
+    vec<std::shared_ptr<Plugin>> plugins;
 };
