@@ -10,7 +10,7 @@
 
 Inventory::Inventory(Scene *scene) : Screen(scene)
 {
-  
+  this->visible = false;
 }
 
 void Inventory::update(float delta)

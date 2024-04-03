@@ -25,6 +25,8 @@ public:
     static Event<float> on_update;
     static Event<> on_render;
 
+    static Event<> on_close;
+
     static const int DEFAULT_SCREEN_WIDTH = 800;
     static const int DEFAULT_SCREEN_HEIGHT = 450;
 

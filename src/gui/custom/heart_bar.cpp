@@ -4,6 +4,8 @@
 
 #include <cmath>
 
+#include <app.h>
+
 #include "heart_bar.h"
 
 bool HeartBar::resources_loaded = false;
@@ -18,8 +20,13 @@ HeartBar::HeartBar()
     Image image_heart_atlas = LoadImageFromMemory(".png", (unsigned char*)assets_raw.at(1100), asset_sizes.at(1100));
     texture_health_atlas = LoadTextureFromImage(image_heart_atlas);
     UnloadImage(image_heart_atlas);
+    
+    App::on_close.subscribe([this]() {
+      UnloadTexture(HeartBar::texture_health_atlas);
+    });
+
+    HeartBar::resources_loaded = true;
   }
-  HeartBar::resources_loaded = true;
 }
 
 void HeartBar::on_render()

@@ -1,4 +1,5 @@
-#include "tick_system.h"
+#include "random/random.h"
+#include "raylib.h"
 #include <iostream>
 #include <vector>
 #include <filesystem>
@@ -19,6 +20,7 @@
 
 #include <asset_ids.h>
 
+#include <tick_system.h>
 #include <gameobject.h>
 #include <scene.h>
 #include <app.h>
@@ -97,12 +99,12 @@ int main()
 	InitAudioDevice();
 
   // Timing
-	SetTargetFPS(60); // -1 Will disable frame cap
+	SetTargetFPS(60); // -1 will disable frame cap
   TickSystem& tick_system = TickSystem::singleton();
 
   SetExitKey(KEY_NULL);
 
-  // ImGUI
+  // ImGui
 #ifndef REMOVE_IMGUI
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -161,68 +163,38 @@ int main()
 		extension.get()->on_game_start();
 	}
 
+  if (!game_checks_successful)
+  {
+    std::string message_text = "";
+    message_text.append("Cannot load the game due to an error:\n\n Code: ");
+    message_text.append(error_message.c_str());
+    if (tinyfd_messageBox("LTecher Adventure - Error", message_text.c_str(), "ok", "error", 1))
+    {
+      App::close();
+    }
+  }
+
   // Main Loop
 	while (!WindowShouldClose() && App::is_running())
 	{	
-    if (!game_checks_successful)
+    if (remaining_splash_time > 0)
     {
-      BeginDrawing();
-      ClearBackground({100, 100, 100, 255});
-
-      std::string message_text = "";
-
-      message_text.append("Cannot load the game due to an error:\n\n Code: ");
-      message_text.append(error_message.c_str());
-
-  #ifndef REMOVE_IMGUI
-      ImGui_ImplOpenGL3_NewFrame();
-      ImGui_ImplGlfw_NewFrame();
-      ImGui::NewFrame();
-
-      ImGui::Begin("LTecher Adventure - Error");
-
-      ImGui::Text("%s", message_text.c_str());
-      if (ImGui::Button("Exit"))
+      if (remaining_splash_time < blank_splash_time && !splash_fx_played)
       {
-        App::close();
+        PlaySound(fx_splash);
+        splash_fx_played = true;
       }
-
-      ImGui::End();
-
-      ImGui::Render();
-      ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-#endif
-      EndDrawing();
-      
-#ifdef REMOVE_IMGUI
-      if (tinyfd_messageBox("LTecher Adventure - Error", message_text.c_str(), "ok", "error", 1))
-      {
-        App::close();
-      }
-#endif
-
-
+      remaining_splash_time = process_splash(remaining_splash_time, blank_splash_time, splash_texture);
       continue;
     }
+    else if (!splash_unloaded)
+    {
+      UnloadSound(fx_splash);
+      UnloadTexture(splash_texture);
 
-    if (remaining_splash_time > 0)
-		{
-			if (remaining_splash_time < blank_splash_time && !splash_fx_played)
-			{
-				PlaySound(fx_splash);
-				splash_fx_played = true;
-			}
-			remaining_splash_time = process_splash(remaining_splash_time, blank_splash_time, splash_texture);
-			continue;
-		}
-		else if (!splash_unloaded)
-		{
-			UnloadSound(fx_splash);
-			UnloadTexture(splash_texture);
-
-			splash_unloaded = true;
+      splash_unloaded = true;
       Scene::set_current_scene(std::make_shared<GameScene>());
-		}
+    }
 
 		BeginDrawing();
       ClearBackground({0, 255, 255, 255});
@@ -231,8 +203,7 @@ int main()
       ImGui_ImplOpenGL3_NewFrame();
       ImGui_ImplGlfw_NewFrame();
       ImGui::NewFrame();
-#endif
-
+#endif  
       if (Scene::is_scene_loaded())
 			{
         App::on_update.emit(GetFrameTime());
@@ -242,8 +213,8 @@ int main()
         App::on_render.emit();
         App::render_objects(Scene::get_current_scene()->get_children());
         Scene::get_current_scene()->on_render();
-			} 
-		
+			}
+
 		  if (!CLRCMP(App::screen_tint, WHITE))
 		  {
 			  DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(App::screen_tint, 0.2f));
@@ -253,10 +224,11 @@ int main()
       ImGui::Render();
       ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 #endif
-
 		EndDrawing();
-
 	}
+
+  App::on_close.emit();
+  unload_assets();
 
 #ifndef REMOVE_IMGUI
   ImGui_ImplOpenGL3_Shutdown();

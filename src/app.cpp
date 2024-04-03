@@ -8,6 +8,8 @@ bool App::running = true;
 Event<float> App::on_update;
 Event<> App::on_render;
 
+Event<> App::on_close;
+
 Color App::screen_tint = WHITE;
 
 vec<std::shared_ptr<Plugin>> App::plugins;

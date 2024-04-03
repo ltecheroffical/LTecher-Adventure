@@ -1,3 +1,4 @@
+#include "raylib.h"
 #include <raylib.h>
 #include <raymath.h>
 
@@ -30,11 +31,15 @@ Player::Player()
     Player::texture_player_atlas = LoadTextureFromImage(image_player_atlas);
     UnloadImage(image_player_atlas);
 
+    App::on_close.subscribe([this](){
+      UnloadTexture(this->texture_player_atlas);
+    });
+  
     Player::resources_loaded = true;
-  }
+  } 
 
   Player::players.push_back(this);
-
+  
   this->scale = 5;
 }
 
