@@ -1,4 +1,7 @@
 #include <raylib.h>
+#include <tinyfiledialogs.h>
+
+#include <stdexcept>
 
 #include <ltmath.h>
 
@@ -31,18 +34,37 @@ PauseMenu::PauseMenu(Scene *scene) : Screen(scene)
   this->menu_callbacks[0] = [&]() {
     this->paused = false;
   };
+
   this->menu_callbacks[1] = [&]() {
+    try
+    {
+      GameSave::current_save->load();
+      this->paused = false;
+    }
+    catch (std::runtime_error &e)
+    {
+      std::cerr << "Error while loading save: " << e.what() << std::endl;
+      if (tinyfd_messageBox("Error", e.what(), "yesno", "error", 1) == 1)
+      {
+        this->menu_callbacks[1]();
+      }
+    }
+  };
+
+  this->menu_callbacks[2] = [&]() {
     GameSave::current_save->players = Player::players;
     GameSave::current_save->save_screenshot = LoadImageFromScreen();
     GameSave::current_save->save();
     this->paused = false;
   };
-  this->menu_callbacks[2] = [&]() {
+
+  this->menu_callbacks[3] = [&]() {
     GameSave::current_save->players = Player::players;
     GameSave::current_save->save();
     App::singleton().close();
   };
-  this->menu_callbacks[3] = [&]() {
+
+  this->menu_callbacks[4] = [&]() {
     App::singleton().close();
   };
 }
@@ -63,7 +85,7 @@ void PauseMenu::update(float delta)
     this->selected++;
   }
 
-  this->selected = LTMath::wrap(this->selected, 0, 3);
+  this->selected = LTMath::wrap(this->selected, 0, this->menu_callbacks.size() - 1);
 }
 
 void PauseMenu::render()

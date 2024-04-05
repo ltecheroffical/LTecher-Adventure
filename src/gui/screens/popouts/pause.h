@@ -25,14 +25,15 @@ public:
 private:
   int selected = 0;
 
-  const std::array<std::string, 4> menu_options = {
+  const std::array<std::string, 5> menu_options = {
     "Resume",
+    "Load",
     "Save",
     "Save & Quit",
     "Quit"
   };
 
-  std::array<std::function<void()>, 4> menu_callbacks = {
+  std::array<std::function<void()>, 5> menu_callbacks = {
     // Filled out in the constructor
   };
 

@@ -21,13 +21,15 @@ public:
   void save();
   void load();
 
-  std::string save_name;
-
+  uint16_t version = 1;
   int date_created = time(NULL);
+
+  std::string save_name;
   
   Image save_screenshot = LoadImageFromScreen();
 
   std::vector<Player*> players = Player::players;
+  std::vector<PlayerData*> player_data;
 
   static GameSave *current_save;
 

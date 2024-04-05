@@ -1,6 +1,6 @@
+#include <algorithm>
 #include <cstdint>
 #include <iostream>
-#include <memory>
 #include <vector>
 
 #include <raylib.h>
@@ -14,16 +14,43 @@
 
 GameSave *GameSave::current_save = nullptr;
 
+constexpr char header[7] = {
+  'L',
+  'T',
+  'A',
+  'S',
+  'A',
+  'V',
+  'E'
+};
+
 GameSave::GameSave(char *file_path)
 {
-  this->save_file.open(file_path, std::ios::out | std::ios::in);
-
   if (GameSave::current_save != nullptr)
   {
     throw("There is already a save file open!");
   }
-  data.assign(std::istreambuf_iterator<char>(this->save_file),
-             std::istreambuf_iterator<char>());
+
+  this->save_file.open(file_path, std::ios::binary | std::ios::out | std::ios::in);
+
+  if (!this->save_file.is_open())
+  {
+    // Try to open it in write only mode
+    this->save_file.open(file_path, std::ios::binary | std::ios::out);
+    
+    if (!this->save_file.is_open())
+    {
+      // The save file cannot be written either way
+      throw std::runtime_error("The save file cannot be opened!");
+    }
+  }
+  else
+  {
+    // The save file exists already and no error occurred, load it
+    data.assign(std::istreambuf_iterator<char>(this->save_file),
+                std::istreambuf_iterator<char>());
+  }
+ 
   GameSave::current_save = this;
 }
 
@@ -40,28 +67,32 @@ void GameSave::save()
 {
   this->data.clear();
 
-  char *save_name_c_str = (char*)this->save_name.c_str();
+  // Header
+  this->data.insert(this->data.end(),
+      reinterpret_cast<char*>((char*)&header),
+      reinterpret_cast<char*>((char*)&header) + sizeof(header));
 
+
+  // Metadata
+  this->data.insert(this->data.end(),
+      reinterpret_cast<char*>(&this->version),
+      reinterpret_cast<char*>(&this->version) + sizeof(uint16_t));
+
+  this->data.insert(this->data.end(),
+      reinterpret_cast<char*>(&this->date_created),
+      reinterpret_cast<char*>(&this->date_created) + sizeof(int));
+  
+  // Save Name
   uint8_t save_name_length = (uint8_t)this->save_name.length();
+  char *save_name_c_str = (char *)this->save_name.c_str();
 
+  this->data.insert(this->data.end(),
+      reinterpret_cast<char*>(&save_name_length),
+      reinterpret_cast<char*>(&save_name_length) + sizeof(uint8_t));
 
-
-#pragma region Screenshot
-  this->data.resize(this->data.size() + sizeof(uint8_t));
-  std::copy(reinterpret_cast<char*>(&save_name_length),
-            reinterpret_cast<char*>(&save_name_length) + sizeof(uint8_t),
-            this->data.end() - sizeof(uint8_t));
+  this->data.insert(this->data.end(), save_name_c_str, save_name_c_str + save_name_length);
   
-  this->data.resize(this->data.size() + save_name_length);
-  std::copy(save_name_c_str,
-            save_name_c_str + save_name_length,
-            this->data.end() - save_name_length);
-
-  this->data.resize(this->data.size() + sizeof(int));
-  std::copy(reinterpret_cast<char*>(&this->date_created),
-            reinterpret_cast<char*>(&this->date_created) + sizeof(int),
-            this->data.end() - sizeof(int));
-  
+  // Screenshot
   int image_data_size = GetPixelDataSize(
       this->save_screenshot.width,
       this->save_screenshot.height,
@@ -75,26 +106,18 @@ void GameSave::save()
   std::vector<char> image_data(image_data_bytes, image_data_bytes + image_data_size);
 
   int image_file_size = (int)image_data.size();
-  this->data.resize(this->data.size() + sizeof(int));
-  std::copy(reinterpret_cast<char*>(&image_file_size),
-            reinterpret_cast<char*>(&image_file_size) + sizeof(int),
-            this->data.end() - sizeof(int));
+  this->data.insert(this->data.end(),
+      reinterpret_cast<char*>(&image_file_size),
+      reinterpret_cast<char*>(&image_file_size) + sizeof(int));
   
-  this->data.resize(this->data.size() + image_file_size);
-  std::copy(image_data.begin(),
-            image_data.end(),
-            this->data.end() - image_file_size);
-#pragma endregion
+  this->data.insert(this->data.end(), image_data.begin(), image_data.end());
 
 
-
+  // Player
   std::vector<char> player_data;
   for (int i = 0; i < this->players.size(); i++)
   {
     Player *player = this->players[i];
-
-    float player_x = player->position.x;
-    float player_y = player->position.y;
    
     Health health = player->health;
 
@@ -103,57 +126,203 @@ void GameSave::save()
 
     unsigned int player_size = 0;
 
-    player_data.resize(player_data.size() + sizeof(int));
+    player_data.resize(player_data.size() + sizeof(unsigned int));
 
-    player_data.resize(player_data.size() + sizeof(int));
-    player_size += sizeof(int);
-    std::copy(reinterpret_cast<char*>(&player_x),
-              reinterpret_cast<char*>(&player_x) + sizeof(float),
-              player_data.end() - sizeof(float));
-
-    player_data.resize(player_data.size() + sizeof(float));
+    // Player/Position
     player_size += sizeof(float);
-    std::copy(reinterpret_cast<char*>(&player_y),
-              reinterpret_cast<char*>(&player_y) + sizeof(float),
-              player_data.end() - sizeof(float));
+    player_data.insert(player_data.end(),
+        reinterpret_cast<char*>(&player->position.x),
+        reinterpret_cast<char*>(&player->position.x) + sizeof(float));
+
+    player_size += sizeof(float); 
+    player_data.insert(player_data.end(),
+        reinterpret_cast<char*>(&player->position.y),
+        reinterpret_cast<char*>(&player->position.y) + sizeof(float));
+
+    // Player/Health
+    player_size += sizeof(float);
+    player_data.insert(player_data.end(),
+        reinterpret_cast<char*>(&health_value),
+        reinterpret_cast<char*>(&health_value) + sizeof(float));
+
+
+    player_size += sizeof(float);
+    player_data.insert(player_data.end(),
+        reinterpret_cast<char*>(&health_max),
+        reinterpret_cast<char*>(&health_max) + sizeof(float));
     
-
-    player_data.resize(player_data.size() + sizeof(int));
-    player_size += sizeof(float);
-    std::copy(reinterpret_cast<char*>(&health_value),
-              reinterpret_cast<char*>(&health_value) + sizeof(float),
-              player_data.end() - sizeof(float));
-
-    player_data.resize(player_data.size() + sizeof(float));
-    player_size += sizeof(float);
-    std::copy(reinterpret_cast<char*>(&health_max),
-              reinterpret_cast<char*>(&health_max) + sizeof(float),
-              player_data.end() - sizeof(float));
-    
+    // Player/Size
     std::copy(reinterpret_cast<char*>(&player_size),
-              reinterpret_cast<char*>(&player_size) + sizeof(int),
-              player_data.end() - player_size - sizeof(int));
+              reinterpret_cast<char*>(&player_size) + sizeof(unsigned int),
+              player_data.end() - player_size - sizeof(unsigned int));
   }
 
-  int player_data_size = (int)player_data.size();
+  unsigned int player_data_size = (unsigned int)player_data.size();
 
-  this->data.resize(this->data.size() + sizeof(int));
-  std::copy(reinterpret_cast<char*>(&player_data_size),
-            reinterpret_cast<char*>(&player_data_size) + sizeof(int),
-            this->data.end() - sizeof(int));
+  this->data.insert(this->data.end(),
+      reinterpret_cast<char*>(&player_data_size),
+      reinterpret_cast<char*>(&player_data_size) + sizeof(unsigned int));
   
-  this->data.resize(this->data.size() + player_data_size);
-  std::copy(player_data.begin(),
-            player_data.end(),
-            this->data.end() - player_data_size);
+  this->data.insert(this->data.end(), player_data.begin(), player_data.end());
 
 
   this->save_file.clear();
-  for (int i = 0; i < this->data.size(); i++)
-  {
-    this->save_file << this->data[i];
-  }
+  this->save_file.write(this->data.data(), this->data.size());
   this->save_file.flush();
 
   this->on_save.emit();
+}
+
+void GameSave::load()
+{
+  // Increment each time a read happens with the size of the read
+  int offset = 0;
+
+  // Header Verification
+  std::cout << "Checking save file header..." << std::endl;
+  std::cout << "(left is in save and right is from expected header)" << std::endl;
+  for (int i = 0; i < sizeof(header); i++)
+  {
+    std::cout << this->data[i] << " " << header[i] << " ";
+
+    if (this->data[i] != header[i])
+    {
+      std::cout << "FAIL" << std::endl;
+      throw std::runtime_error("The save file is corrupted! Header check failed!");
+      return;
+    }
+    else
+    {
+      std::cout << "PASS" << std::endl;
+    }
+    offset += sizeof(char);
+  }
+
+  std::cout << "The save file header check was successful!" << std::endl;
+
+  // Metadata
+  std::copy(this->data.begin() + offset,
+            this->data.begin() + offset + sizeof(uint16_t),
+            reinterpret_cast<char*>(&this->version));
+  offset += sizeof(uint16_t);
+
+  std::copy(this->data.begin() + offset,
+            this->data.begin() + offset + sizeof(int),
+            reinterpret_cast<char*>(&this->date_created));
+  offset += sizeof(int);
+
+  // Save Name
+  uint8_t save_name_length = 0;
+  std::copy(this->data.begin() + offset,
+            this->data.begin() + offset + sizeof(uint8_t),
+            reinterpret_cast<char*>(&save_name_length));
+  offset += sizeof(uint8_t);
+
+  // Buffer overflow?
+  if (offset + save_name_length > this->data.size())
+  {
+    throw std::runtime_error("The save file is corrupted! Save name is too large!");
+  }
+
+  this->save_name = std::string(
+    this->data.begin() + offset,
+    this->data.begin() + offset + save_name_length
+  );
+  offset += save_name_length;
+
+  // Screenshot
+  int image_file_size = 0;
+
+  std::copy(this->data.begin() + offset,
+            this->data.begin() + offset + sizeof(int),
+            reinterpret_cast<char*>(&image_file_size));
+  offset += sizeof(int);
+
+
+  // Buffer overflow?
+  if (offset + image_file_size > this->data.size())
+  {
+    throw std::runtime_error("The save file is corrupted! Image is too large!");
+  }
+
+  unsigned char *image_data = (unsigned char *)malloc(image_file_size);
+
+  if (image_data == NULL)
+  {
+    throw std::runtime_error("Failed to allocate memory for image data!");
+  }
+
+  std::copy(this->data.begin() + offset,
+            this->data.begin() + offset + image_file_size,
+            image_data);
+    
+  offset += image_file_size;
+
+  free(image_data);
+
+  this->save_screenshot = LoadImageFromMemory(
+    ".png",
+    image_data,
+    image_file_size
+  );
+
+  // Players
+  unsigned int player_data_size = 0;
+  std::copy(this->data.begin() + offset,
+            this->data.begin() + offset + sizeof(unsigned int),
+            reinterpret_cast<char*>(&player_data_size));
+  offset += sizeof(unsigned int);
+
+  // Buffer overflow?
+  if (offset + player_data_size > this->data.size())
+  {
+    throw std::runtime_error("The save file is corrupted! Player data is too large!");
+  }
+
+  for (int i = 0; i < player_data_size; i++)
+  {
+    // Player
+    // Use stripped down version of the player
+    unsigned int player_size = 0;
+
+    std::copy(this->data.begin() + offset,
+              this->data.begin() + offset + sizeof(unsigned int),
+              reinterpret_cast<char*>(&player_size));
+    offset += sizeof(unsigned int);
+
+    if (player_size == 0)
+    {
+      continue;
+    }
+
+    // Buffer overflow?
+    if (offset + player_size > this->data.size())
+    {
+      throw std::runtime_error("The save file is corrupted! Player is too large!");
+    }
+
+    PlayerData player_data;
+
+    // Player/Position
+    std::copy(this->data.begin() + offset,
+              this->data.begin() + offset + sizeof(float),
+              reinterpret_cast<char*>(&player_data.position.x));
+    offset += sizeof(float);
+
+    std::copy(this->data.begin() + offset,
+              this->data.begin() + offset + sizeof(float),
+              reinterpret_cast<char*>(&player_data.position.y));
+    offset += sizeof(float);
+
+    // Player/Health
+    std::copy(this->data.begin() + offset,
+              this->data.begin() + offset + sizeof(float),
+              reinterpret_cast<char*>(&player_data.health.health));
+    offset += sizeof(float);
+
+    std::copy(this->data.begin() + offset,
+              this->data.begin() + offset + sizeof(float),
+              reinterpret_cast<char*>(&player_data.health.max_health));
+    offset += sizeof(float);
+  }
 }

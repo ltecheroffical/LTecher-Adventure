@@ -7,6 +7,13 @@
 
 #pragma once
 
+// A stripped down version of a player that doesn't do anything but is great for storage
+struct PlayerData
+{
+  Vector2 position = {0, 0};
+  Health health = Health(10);
+};
+
 class Player : public GameObject
 {
 public:
