@@ -9,16 +9,22 @@
 class HeartBar : public UIElement
 {
 public:
-    HeartBar();
-    ~HeartBar() override = default;
+  HeartBar();
+  ~HeartBar() override = default;
 
-    Health health = Health(250);
+  /*
+   * The current health that is shown in the health bar
+   */
+  Health health = Health(250);
 
-    float seperator = 5.0f;
+  /*
+   * The seperation between each heart
+   */
+  float seperator = 5.0f;
 
-    void on_render() override;
+  void on_render() override;
 
 private:
-    static bool resources_loaded;
-    static Texture texture_health_atlas;
+  static bool resources_loaded;
+  static Texture texture_health_atlas;
 };

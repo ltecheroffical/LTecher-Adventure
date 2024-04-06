@@ -119,10 +119,10 @@ void GameSave::save()
   {
     Player *player = this->players[i];
    
-    Health health = player->health;
+    Health *health = player->health_ptr();
 
-    float health_value = health.get_health();
-    float health_max = health.get_max();
+    float health_value = health->get_health();
+    float health_max = health->get_max();
 
     unsigned int player_size = 0;
 
@@ -179,26 +179,35 @@ void GameSave::load()
   int offset = 0;
 
   // Header Verification
+#if PRODUCTION_BUILD == 0
   std::cout << "Checking save file header..." << std::endl;
   std::cout << "(left is in save and right is from expected header)" << std::endl;
+#endif
   for (int i = 0; i < sizeof(header); i++)
   {
     std::cout << this->data[i] << " " << header[i] << " ";
 
     if (this->data[i] != header[i])
     {
+#if PRODUCTION_BUILD == 0
       std::cout << "FAIL" << std::endl;
+#endif
       throw std::runtime_error("The save file is corrupted! Header check failed!");
       return;
     }
+#if PRODUCTION_BUILD == 0
     else
     {
       std::cout << "PASS" << std::endl;
     }
+#endif
+
     offset += sizeof(char);
   }
 
+#if PRODUCTION_BUILD == 0
   std::cout << "The save file header check was successful!" << std::endl;
+#endif
 
   // Metadata
   std::copy(this->data.begin() + offset,
@@ -317,12 +326,12 @@ void GameSave::load()
     // Player/Health
     std::copy(this->data.begin() + offset,
               this->data.begin() + offset + sizeof(float),
-              reinterpret_cast<char*>(&player_data.health.health));
+              reinterpret_cast<char*>(player_data.health.cur_health_ptr()));
     offset += sizeof(float);
 
     std::copy(this->data.begin() + offset,
               this->data.begin() + offset + sizeof(float),
-              reinterpret_cast<char*>(&player_data.health.max_health));
+              reinterpret_cast<char*>(player_data.health.max_health_ptr()));
     offset += sizeof(float);
   }
 }

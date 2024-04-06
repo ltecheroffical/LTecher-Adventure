@@ -1,9 +1,11 @@
 #include <cstdint>
+#include <vector>
 
 #include <gameobject.h>
 
+#include <entities/camera.h>
+
 #include <components/health.h>
-#include <vector>
 
 #pragma once
 
@@ -20,16 +22,35 @@ public:
     Player();
     ~Player() override;
 
-    Health health = Health(10);
+    /*
+     * Returns a pointer to the health component of the player
+     *
+     * @returns The health component of the player as a pointer
+     */
+    inline Health *health_ptr() { return &this->health; };
+
+    /*
+     * Bind the camera that the player will update to follow the player
+     * 
+     * @param camera The camera to make follow the player
+     */
+    void set_camera(GameCamera *camera);
+
+    /*
+     * All the player instances in the game
+     */
+    static std::vector<Player*> players;
 
     void on_update(float delta) override;
     void on_render() override;
 
-    static std::vector<Player*> players;
-
 private:
+    Health health = Health(10);
+
     uint8_t anim_frame = 0;
     float   anim_timer = 0.0f;
+
+    GameCamera *camera = nullptr;
 
     static bool resources_loaded;
     static Texture texture_player_atlas;

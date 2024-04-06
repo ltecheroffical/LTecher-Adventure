@@ -7,6 +7,9 @@
 class AtariRandomHandler
 {
   public:
+    /*
+     * All the bits that are currently in the vector
+     */
     std::vector<bool> bits;
 
     inline static AtariRandomHandler singleton() {

@@ -21,6 +21,9 @@ public:
     // Is the camera enabled?
     bool enabled = true;
 
+    /*
+     * Converts the camera to a raylib camera for use
+     */
     Camera2D to_camera_2d() const;
 
     void on_start() override;

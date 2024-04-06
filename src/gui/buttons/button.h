@@ -7,21 +7,50 @@
 class Button : public UIElement
 {
 public:
-    Button() = default;
-    ~Button() override = default;
+  Button() = default;
+  ~Button() override = default;
 
-    Color background_color = { 40, 40, 40, 255 };
+  /*
+   * The background color of the button.
+   */
+  Color background_color = { 40, 40, 40, 255 };
 
-    Color text_color = WHITE;
-    Font text_font = GetFontDefault();
-    
-    int text_font_size = 16;
-    int text_font_spacing = 2;
+  /*
+   * The text color of the button.
+   */
+  Color text_color = WHITE;
+  /*
+   * The text font of the button.
+   */
+  Font text_font = GetFontDefault();
 
-    char *text_content = (char*)"Label";
-    
-    bool is_pressed() const;
-    bool is_hovered() const;
+  /*
+   * The font size of the text.
+   */
+  int text_font_size = 16;
+  /*
+   * The spacing between the characters
+   */
+  int text_font_spacing = 2;
 
-    void on_render() override;
+  /*
+   * The text of the button
+   */
+  char *text_content = (char*)"Label";
+  
+  /*
+   * If the button is hovered
+   *
+   * @return A boolean value indicating if the button is hovered
+   */
+  bool is_pressed() const;
+  /*
+   * If the button is pressed
+   *
+   * @return A boolean value indicating if the button is pressed
+   */
+  bool is_hovered() const;
+
+
+  void on_render() override;
 };

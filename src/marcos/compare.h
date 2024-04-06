@@ -1,3 +1,7 @@
+/*
+ * A few macros to compare values
+ */
+
 #include <raylib.h>
 
 #define CLRCMP(c1, c2) (((Color)c1).r == ((Color)c2).r &&\

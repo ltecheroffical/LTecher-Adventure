@@ -1,5 +1,3 @@
-#include "random/random.h"
-#include "raylib.h"
 #include <iostream>
 #include <vector>
 #include <filesystem>

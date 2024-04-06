@@ -6,6 +6,9 @@
 class GameScene : public Scene
 {
 private:
+  /*
+   * The HUD is the screen that shows the information
+   */
   GameHUD *screen = new GameHUD(this);
 
 #ifndef REMOVE_IMGUI

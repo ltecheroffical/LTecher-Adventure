@@ -1,3 +1,5 @@
+#include <event.h>
+
 #pragma once
 
 class Health
@@ -7,8 +9,19 @@ public:
     Health(float max, float inital);
     ~Health() = default;
 
-    float health;
-    float max_health;
+    /*
+     * Emitted when the current health has changed
+     */
+    Event<float> on_health_changed;
+    
+    /*
+     * Emitted when the health is healed
+     */
+    Event<float> on_health_healed;
+    /*
+     * Emitted when the health is damaged
+     */
+    Event<float> on_health_damaged;
 
     /*
     * Sets the current health
@@ -57,4 +70,21 @@ public:
     * @returns A bool that tracks if health is zero
     */
     bool is_dead();
+
+    /*
+     * Returns a pointer to the health value
+     *
+     * @returns A pointer to the health
+     */
+    inline float *cur_health_ptr() { return &this->health; };
+    /*
+     * Returns a pointer to the max health value
+     *
+     * @returns A pointer to the max health
+     */
+    inline float *max_health_ptr() { return &this->max_health; };
+
+  private:
+    float health;
+    float max_health;
 };

@@ -54,7 +54,7 @@ Player::~Player()
 
 void Player::on_update(float delta)
 {
-  constexpr float SPEED = 30.0;
+  constexpr float SPEED = 50.0;
 
   Vector2 direction{0, 0};
 
@@ -90,6 +90,11 @@ void Player::on_update(float delta)
 
     this->position.x -= direction.x * SPEED * delta;
     this->position.y -= direction.y * SPEED * delta;
+
+    if (this->camera != nullptr)
+    {
+      this->camera->position = this->position;
+    }
   }
   else if (this->anim_timer > 1.0f)
   {
@@ -100,7 +105,7 @@ void Player::on_update(float delta)
   {
     this->anim_frame = 0;
   }
-  this->health.damage(delta * 0.1f);
+  this->health_ptr()->damage(delta * 0.1f);
 }
 
 void Player::on_render()
@@ -119,8 +124,21 @@ void Player::on_render()
     ImGui::Begin("Player", NULL, 0);
 
     ImGui::InputFloat2("Position", &this->position.x);
-    ImGui::InputFloat("Health", &this->health.health, 0.1f, 0.5f);
+    ImGui::InputFloat("Health", this->health.cur_health_ptr(), 0.1f, 0.5f);
 
     ImGui::End();
   #endif
+}
+
+void Player::set_camera(GameCamera *camera)
+{
+  this->camera = camera;
+
+  if (this->camera != nullptr)
+  {
+    this->camera->position = this->position;
+  
+    camera->offset.x = static_cast<float>(GetScreenWidth() - (16 * this->scale)) / 2.0f;
+    camera->offset.y = static_cast<float>(GetScreenHeight() - (16 * this->scale)) / 2.0f;
+  }
 }

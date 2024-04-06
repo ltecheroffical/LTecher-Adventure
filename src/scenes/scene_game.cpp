@@ -36,33 +36,28 @@ void GameScene::on_load()
 
   auto obj_player = std::make_shared<Player>();
   auto obj_camera = std::make_shared<GameCamera>();
+  auto obj_health_bar = dynamic_cast<HeartBar*>(this->get_child(1001).get());
+
+  obj_player->set_camera(obj_camera.get());
+
+  obj_player->health_ptr()->on_health_changed.subscribe([this](float health) {
+    auto obj_health_bar = dynamic_cast<HeartBar*>(this->get_child(1001).get());
+    obj_health_bar->health.set_health(health);
+  });
+
+  obj_health_bar->health.set_max(obj_player->health_ptr()->get_max());
+
+  this->add_child(obj_player, 0);
+  this->add_child(obj_camera, 500);
 
 #ifndef REMOVE_IMGUI
   this->save_screenshot = LoadTextureFromImage(GameSave::current_save->save_screenshot);
 #endif
-
-  this->add_child(obj_player, 0);
-  this->add_child(obj_camera, 500); 
 }
 
 void GameScene::on_update(float delta)
 {
   this->screen->update(delta);
-
-  auto obj_health_bar = dynamic_cast<HeartBar*>(this->get_child(1001).get());
-
-  auto obj_player = dynamic_cast<Player*>(this->get_child(0).get());
-  auto obj_camera = dynamic_cast<GameCamera*>(this->get_child(500).get());
-  
-  const auto player_sprite_width = static_cast<int>(16 * obj_player->scale);
-  const auto player_sprite_height = static_cast<int>(16 * obj_player->scale);
-
-  obj_camera->offset.x = static_cast<float>(GetScreenWidth() - player_sprite_width) / 2.0f;
-  obj_camera->offset.y = static_cast<float>(GetScreenHeight() - player_sprite_height) / 2.0f;
-
-  obj_camera->position = obj_player->position;
-
-  obj_health_bar->health = obj_player->health; 
 }
 
 void GameScene::on_render()
@@ -72,7 +67,7 @@ void GameScene::on_render()
 #ifndef REMOVE_IMGUI
   ImGui::Begin("Save Data", NULL, 0);
 
-  ImGui::InputText("Save Name", (char*)GameSave::current_save->save_name.c_str(), 256);
+  ImGui::Text("Save Name: %s", (char*)GameSave::current_save->save_name.c_str());
   ImGui::Checkbox("Show Screenshot", &this->show_screenshot);
 
   if (this->show_screenshot)

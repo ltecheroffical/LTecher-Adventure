@@ -6,11 +6,37 @@
 
 #define vec std::vector
 
+/*
+ * All the assets that are loaded
+ */
 inline std::map<int, vec<char>> assets;
+/*
+ * All the assets that are loaded except in C format
+ */
 inline std::map<int, char*> assets_raw;
 
+/*
+ * All the sizes of the assets
+ */
 inline std::map<int, unsigned int> asset_sizes;
 
+/*
+ * The header of the assets file used for verification
+ */
+constexpr char header[8] = {
+  'L',
+  'T',
+  'A',
+  's',
+  's',
+  'e',
+  't',
+  's'
+};
+
+/*
+ * Loads all the assets from the assets file
+ */
 inline void load_assets(char *path)
 {
   std::ifstream assets_file(path);
@@ -27,6 +53,16 @@ inline void load_assets(char *path)
   assets_file.close(); 
 
   int bytes_left = 0;
+
+  // Verify header
+  for (int i = 0; i < sizeof(header); i++)
+  {
+    if (data[i] != header[i])
+    {
+      throw std::runtime_error("The assets file is corrupted! Header check failed!");
+      return;
+    }
+  }
 
   for (int i = 8; i < (int)file_size; i++)
   {
@@ -57,7 +93,7 @@ inline void load_assets(char *path)
     if (bytes_left < asset_size)
     {
       // The assets may have been used as a buffer overflow attack
-      throw((char*)"Asset id #" + std::to_string(asset_id) + " is too large!");
+      throw std::runtime_error((char*)"Asset id #" + std::to_string(asset_id) + " is too large!");
     }
 
     std::copy(&data[i], &data[i + asset_size], asset_data.begin());
@@ -84,6 +120,9 @@ inline void load_assets(char *path)
   }
 }
 
+/*
+ * Unloads all the assets
+ */
 inline void unload_assets()
 {
   // Free all the assets
@@ -91,4 +130,9 @@ inline void unload_assets()
   {
     free(it->second);
   }
+
+  // Delete the assets from the assets data
+  assets.clear();
+  assets_raw.clear();
+  asset_sizes.clear();
 }

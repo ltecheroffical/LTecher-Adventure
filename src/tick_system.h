@@ -4,18 +4,29 @@
 
 class TickSystem
 {
-  public:
+public:
+  static TickSystem& singleton() { 
+    static TickSystem instance;
+    return instance; 
+  };
+  
+  /*
+   * Gets the number of ticks
+   */
+  int get_ticks() { return this->ticks; };
+  /*
+   * Gets a pointer to the number of ticks
+   */
+  int *ticks_ptr() { return &this->ticks; };
 
-    static TickSystem& singleton() { 
-      static TickSystem instance;
-      return instance; 
-    };
-    
-    Event<> on_tick;
+  /*
+   * Emitted every tick
+   */
+  Event<> on_tick;
 
-  private:
-    TickSystem();
+private:
+  TickSystem();
 
-    int ticks = 0;
-    float tick_time = 0.0f;
+  int ticks = 0;
+  float tick_time = 0.0f;
 };

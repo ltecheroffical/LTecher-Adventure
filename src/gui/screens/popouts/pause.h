@@ -17,11 +17,14 @@ public:
   PauseMenu(Scene *scene);
   ~PauseMenu() = default;
 
-  void update(float delta) override;
-  void render() override;
 
+  /*
+   * Controls if the popup is visible
+   */
   bool paused = false;
 
+  void update(float delta) override;
+  void render() override;
 private:
   int selected = 0;
 
