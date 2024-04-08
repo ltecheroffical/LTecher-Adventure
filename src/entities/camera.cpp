@@ -6,18 +6,18 @@ GameCamera *GameCamera::camera = nullptr;
 
 GameCamera::~GameCamera()
 {
-    if (GameCamera::camera == this)
-    {
-        GameCamera::camera = nullptr;
-    }
+  if (GameCamera::camera == this)
+  {
+    GameCamera::camera = nullptr;
+  }
 }
 
 void GameCamera::on_start()
 {
-    if (this->enabled)
-    {
-        GameCamera::camera = this;
-    }
+  if (this->enabled)
+  {
+    GameCamera::camera = this;
+  }
 }
 
 Camera2D GameCamera::to_camera_2d() const

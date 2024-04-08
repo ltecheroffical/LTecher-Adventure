@@ -9,13 +9,13 @@ public:
   using Callback = std::function<void(Args...)>;
 
   void subscribe(Callback callback) {
-      callbacks.push_back(callback);
+    callbacks.push_back(callback);
   }
 
   void emit(Args... args) {
-      for (auto& callback : callbacks) {
-          callback(args...);
-      }
+    for (auto& callback : callbacks) {
+      callback(args...);
+    }
   }
 
 private:

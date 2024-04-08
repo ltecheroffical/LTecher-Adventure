@@ -5,6 +5,7 @@
 
 #include <entities/camera.h>
 
+#include <components/entites/player_anim.h>
 #include <components/health.h>
 
 #pragma once
@@ -47,11 +48,16 @@ public:
 private:
     Health health = Health(10);
 
+    // Animation component
+    PlayerAnim *anim;
     uint8_t anim_frame = 0;
-    float   anim_timer = 0.0f;
+
+    Event<Vector2> on_move_animation;
+    Event<> on_still_animation;
 
     GameCamera *camera = nullptr;
 
+    // Resources
     static bool resources_loaded;
     static Texture texture_player_atlas;
 };

@@ -22,6 +22,7 @@
 #include <gameobject.h>
 #include <scene.h>
 #include <app.h>
+#include <keybinds.h>
 
 #include <marcos/compare.h>
 
@@ -37,11 +38,54 @@ void update_objects(const std::vector<std::shared_ptr<GameObject>> *objects)
 	for (std::shared_ptr<GameObject> object : *objects)
 	{
 		object->on_update(GetFrameTime());
+    for (Component *component : object->get_components())
+    {
+      component->on_update(GetFrameTime());
+    }
 	}
 
 	for (std::shared_ptr<Plugin> extension : *App::singleton().get_loaded_plugins())
 	{
-		extension.get()->on_update(GetFrameTime());
+		extension.get()->on_update(GetFrameTime()); 
+	}
+}
+#pragma endregion
+
+#pragma region Render Objects
+void App::render_objects(const std::vector<std::shared_ptr<GameObject>> *objects)
+{
+	for (std::shared_ptr<GameObject> object : *objects)
+	{
+		if (!object->visible || object->is_gui)
+		{
+			continue;
+		}
+
+    for (Component *component : object->get_components())
+    {
+      component->on_render();
+    }
+
+		object->on_render();
+	}
+
+	for (std::shared_ptr<GameObject> object : *objects)
+	{
+		if (!object->visible || !object->is_gui)
+		{
+			continue;
+		}
+
+    for (Component *component : object->get_components())
+    {
+      component->on_render();
+    }
+		object->on_render();
+	}
+
+	for (std::shared_ptr<Plugin> extension : *App::get_loaded_plugins())
+	{
+		extension.get()->on_render();
 	}
 }
 #pragma endregion
@@ -171,6 +215,9 @@ int main()
       App::singleton().close();
     }
   }
+
+  // Setup keybinds
+  Keybinds::singleton().load_default_bindings();
 
   // Main Loop
 	while (!WindowShouldClose() && App::singleton().is_running())

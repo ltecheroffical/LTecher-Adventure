@@ -6,6 +6,7 @@
 #include <ltmath.h>
 
 #include <app.h>
+#include <keybinds.h>
 #include <asset_ids.h>
 
 #include <entities/player.h>
@@ -71,16 +72,16 @@ PauseMenu::PauseMenu(Scene *scene) : Screen(scene)
 
 void PauseMenu::update(float delta)
 {
-  if (IsKeyPressed(KEY_ESCAPE))
+  if (IsKeyPressed(Keybinds::singleton().get(Keybind::KEYBIND_PAUSE)))
   {
     this->paused = !this->paused;
   }
 
-  if (IsKeyPressed(KEY_UP))
+  if (IsKeyPressed(Keybinds::singleton().get(Keybind::KEYBIND_PAUSE_UP)))
   {
     this->selected--;
   }
-  else if (IsKeyPressed(KEY_DOWN))
+  else if (IsKeyPressed(Keybinds::singleton().get(Keybind::KEYBIND_PAUSE_DOWN)))
   {
     this->selected++;
   }

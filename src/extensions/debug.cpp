@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include <keybinds.h>
 #include <os_info.h>
 
 #include "debug.h"
@@ -10,7 +11,7 @@ bool Debugger::is_visible = false;
 
 void Debugger::on_update(float delta)
 {
-  if (IsKeyPressed(KEY_F3))
+  if (IsKeyPressed(Keybinds::singleton().get(Keybind::KEYBIND_DEBUG)))
   {
     Debugger::is_visible = !Debugger::is_visible;
   }

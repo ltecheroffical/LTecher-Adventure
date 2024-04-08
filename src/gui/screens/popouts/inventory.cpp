@@ -1,6 +1,8 @@
 #include <raylib.h>
 
 #include <app.h>
+#include <keybinds.h>
+
 #include <asset_ids.h>
 
 #include "inventory.h"
@@ -15,7 +17,7 @@ Inventory::Inventory(Scene *scene) : Screen(scene)
 
 void Inventory::update(float delta)
 {
-  if (IsKeyPressed(KEY_E))
+  if (IsKeyPressed(Keybinds::singleton().get(Keybind::KEYBIND_INVENTORY)))
   {
     this->visible = !this->visible;
   }

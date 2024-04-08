@@ -85,6 +85,7 @@ public:
    * @param id The id of the object (if value is `OBJ_ID_NONE` it will be added as a random id)
    */
   void add_child(std::shared_ptr<GameObject> object, int id);
+  inline void remove_child(int id) { this->object_map.erase(id); };
 
   inline std::shared_ptr<GameObject> get_child(int id) {
     if (!object_map.contains(id))

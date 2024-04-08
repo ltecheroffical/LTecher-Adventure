@@ -7,11 +7,6 @@ Health::Health(float max) : max_health(max), health(max)
   
 }
 
-Health::Health(float max, float inital) : max_health(max), health(inital)
-{
-  
-}
-
 void Health::set_health(float health)
 {
   this->health = LTMath::clamp(health, 0, this->max_health);;

@@ -9,6 +9,7 @@
 #include <imgui.h>
 #endif
 
+#include <keybinds.h>
 #include <app.h>
 
 #include "camera.h"
@@ -38,13 +39,22 @@ Player::Player()
     Player::resources_loaded = true;
   } 
 
-  Player::players.push_back(this);
-  
   this->scale = 5;
+  
+  this->anim = new PlayerAnim(&this->anim_frame, &this->on_move_animation, &this->on_still_animation);
+
+  this->add_component(&this->health, 0);
+  this->add_component(this->anim, 1);
+
+  Player::players.push_back(this);
 }
 
 Player::~Player()
 {
+  this->remove_component(0);
+  this->remove_component(1);
+
+  delete this->anim;
 #ifndef WIN32
   Player::players.erase(std::remove(Player::players.begin(), 
                         Player::players.end(), this),
@@ -58,47 +68,23 @@ void Player::on_update(float delta)
 
   Vector2 direction{0, 0};
 
-  this->anim_timer += delta; 
-  
-  direction.x = static_cast<float>(IsKeyDown(KEY_D)) - static_cast<float>(IsKeyDown(KEY_A));
-  direction.y = static_cast<float>(IsKeyDown(KEY_S)) - static_cast<float>(IsKeyDown(KEY_W));
+  Keybinds binds = Keybinds::singleton();
+
+  direction.x = static_cast<float>(IsKeyDown(binds.get(Keybind::KEYBIND_RIGHT))) - static_cast<float>(IsKeyDown(binds.get(Keybind::KEYBIND_LEFT)));
+  direction.y = static_cast<float>(IsKeyDown(binds.get(Keybind::KEYBIND_DOWN))) - static_cast<float>(IsKeyDown(binds.get(Keybind::KEYBIND_UP)));
 
   if (direction.x != 0 || direction.y != 0)
   {
     direction = Vector2Normalize(direction);
     
-    if (this->anim_timer > 0.5f)
-    {
-      if (direction.y == -1)
-      {
-        this->anim_frame = LTMath::wrap(this->anim_frame + 1, 4, 5);
-      }
-      else if (direction.y == 1)
-      {
-        this->anim_frame = LTMath::wrap(this->anim_frame + 1, 2, 3);
-      }
-      else if (direction.x == -1)
-      {
-        this->anim_frame = LTMath::wrap(this->anim_frame + 1, 6, 7);
-      }
-      else if (direction.x == 1)
-      {
-        this->anim_frame = LTMath::wrap(this->anim_frame + 1, 8, 9);
-      }
-      this->anim_timer = 0.0f;
-    }
+    this->on_move_animation.emit(direction); 
 
     this->position.x -= direction.x * SPEED * delta;
     this->position.y -= direction.y * SPEED * delta;
   }
-  else if (this->anim_timer > 1.0f)
+  else
   {
-    this->anim_frame = LTMath::wrap(this->anim_frame + 1, 0, 1);
-    this->anim_timer = 0.0f;
-  }
-  else if (this->anim_frame > 1)
-  {
-    this->anim_frame = 0;
+    this->on_still_animation.emit();
   }
 
   if (Vector2Distance(this->position, this->camera->position) > 1)
