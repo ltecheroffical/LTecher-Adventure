@@ -264,7 +264,6 @@ void GameSave::load()
   std::copy(this->data.begin() + offset,
             this->data.begin() + offset + image_file_size,
             image_data);
-    
   offset += image_file_size;
 
   free(image_data);
@@ -307,7 +306,7 @@ void GameSave::load()
     // Buffer overflow?
     if (offset + player_size > this->data.size())
     {
-      throw std::runtime_error("The save file is corrupted! Player is too large!");
+      break;
     }
 
     PlayerData player_data;
@@ -334,4 +333,8 @@ void GameSave::load()
               reinterpret_cast<char*>(player_data.health.max_health_ptr()));
     offset += sizeof(float);
   }
+
+
+
+  this->on_load.emit();
 }

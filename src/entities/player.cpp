@@ -1,7 +1,7 @@
-#include "raylib.h"
 #include <raylib.h>
 #include <raymath.h>
 
+#include <marcos/compare.h>
 #include <asset_ids.h>
 #include <ltmath.h>
 
@@ -90,11 +90,6 @@ void Player::on_update(float delta)
 
     this->position.x -= direction.x * SPEED * delta;
     this->position.y -= direction.y * SPEED * delta;
-
-    if (this->camera != nullptr)
-    {
-      this->camera->position = this->position;
-    }
   }
   else if (this->anim_timer > 1.0f)
   {
@@ -105,6 +100,13 @@ void Player::on_update(float delta)
   {
     this->anim_frame = 0;
   }
+
+  if (Vector2Distance(this->position, this->camera->position) > 1)
+  {
+    this->camera->position.x = Lerp(this->camera->position.x, this->position.x, delta * 2.5f);
+    this->camera->position.y = Lerp(this->camera->position.y, this->position.y, delta * 2.5f);
+  }
+
   this->health_ptr()->damage(delta * 0.1f);
 }
 
@@ -136,7 +138,7 @@ void Player::set_camera(GameCamera *camera)
 
   if (this->camera != nullptr)
   {
-    this->camera->position = this->position;
+    this->camera->position = this->position; 
   
     camera->offset.x = static_cast<float>(GetScreenWidth() - (16 * this->scale)) / 2.0f;
     camera->offset.y = static_cast<float>(GetScreenHeight() - (16 * this->scale)) / 2.0f;

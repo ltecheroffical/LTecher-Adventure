@@ -30,7 +30,7 @@ class AtariRandomHandler
       App::singleton().on_update.subscribe([this](float delta) {
         // Update atari random
         int index_end = this->bits.size();
-        this->bits.push_back(this->bits[index_end - 8] != this->bits[index_end]);
+        this->bits.push_back(this->bits[0] != this->bits[1]);
         this->bits.erase(this->bits.begin());
       });
     };

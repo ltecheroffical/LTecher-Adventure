@@ -14,4 +14,4 @@
 
 #define VEC2CMP(v1, v2) (((Vector2)v1).x == ((Vector2)v2).x &&\
   ((Vector2)v1).y == ((Vector2)v2).y &&\
-  ((Vector2)v1).z == ((Vector2)v2).z)
+  ((Vector2)v1).x == ((Vector2)v2).x)

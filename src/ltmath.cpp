@@ -1,6 +1,6 @@
 #include "ltmath.h"
 
-int LTMath::wrap(int value, int min, int max)
+float LTMath::wrap(float value, float min, float max)
 {
   if (value < min)
   {
@@ -10,5 +10,18 @@ int LTMath::wrap(int value, int min, int max)
   {
     return min;
   } 
+  return value;
+}
+
+float LTMath::clamp(float value, float min, float max)
+{
+  if (value > max)
+  {
+    return max;
+  }
+  else if (value < min)
+  {
+    return min;
+  }
   return value;
 }
