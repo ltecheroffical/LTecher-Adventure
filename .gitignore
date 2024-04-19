@@ -1,0 +1,28 @@
+# CMake
+build_macos/*
+build_win32/*
+
+# Clangd
+.cache/
+
+# Neovim
+compile_commands.json
+build_project.sh
+run_project.sh
+
+# MacOS
+**/.DS_Store
+**/._*
+
+# IDE
+.vscode
+*.suo
+*.user
+*.sln
+*.sdf
+*.suo
+*.user
+*.sdf
+
+# Game generated
+imgui.ini
