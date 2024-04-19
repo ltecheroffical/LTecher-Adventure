@@ -34,6 +34,7 @@ int main(int argc, char** argv) {
 
   if (App::singleton().renderer == NULL) {
     SDL_DestroyWindow(App::singleton().window);
+    SDL_Quit();
     PANIC((std::string)"SDL failed to create renderer!", -1);
   }
 

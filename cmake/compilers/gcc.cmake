@@ -5,3 +5,10 @@ target_link_options(${CMAKE_PROJECT_NAME} PRIVATE
   -static-libstdc++
   -Wl,-R,'$$ORIGIN'
 )
+
+# Check for mingw
+if (MINGW)
+  target_link_options(${CMAKE_PROJECT_NAME} PRIVATE
+    -static
+  )
+endif()

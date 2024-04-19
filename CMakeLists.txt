@@ -18,7 +18,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 # Windows compability
 if (WIN32)
-  include(cmake/windows.cmake)
+  include(cmake/platform/windows.cmake)
 endif()
 
 # Libraries
