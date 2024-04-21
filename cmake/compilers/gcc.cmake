@@ -12,3 +12,8 @@ if (MINGW)
     -static
   )
 endif()
+
+target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE
+  -Wall
+  -Werror
+)

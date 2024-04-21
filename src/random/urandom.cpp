@@ -1,10 +1,3 @@
-/*
- * LTecher Adventure (c) 2024
- *
- * This file belongs to the LTecher Adventure project
- */
-
-
 #include "urandom.h"
 
 DevURandomGenerator::DevURandomGenerator() : _urandom("/dev/urandom") {

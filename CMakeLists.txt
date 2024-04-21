@@ -55,8 +55,8 @@ set(RESOURCES_PATH "resources/")
 
 option(
   HARDCODE_PATH_IN_DEBUG
-  "Sets if the path is hardcoded into the binary on debug mode.\n
-    Useful when building to other platforms and testing" ON)
+  "Sets if the path is hardcoded into the binary on debug mode.
+  Useful when building to other platforms and testing" ON)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
   set(PRODUCTION_BUILD 1)
@@ -70,7 +70,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release" OR NOT HARDCODE_PATH_IN_DEBUG)
   target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC RESOURCES="${RESOURCES_PATH}") 
 else()
   set(RESOURCES_PATH "${CMAKE_CURRENT_SOURCE_DIR}/resources/")
-  target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC RESOURCES="${CMAKE_CURRENT_SOURCE_DIR}/${RESOURCES_PATH}")
+  target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC RESOURCES="${RESOURCES_PATH}")
 endif()
 
 message(STATUS "RESOURCES_PATH = ${RESOURCES_PATH}")

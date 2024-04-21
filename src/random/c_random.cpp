@@ -1,9 +1,3 @@
-/*
- * LTecher Adventure (c) 2024
- *
- * This file belongs to the LTecher Adventure project
- */
-
 #include <cstdlib>
 
 #include <SDL3/SDL.h>
@@ -77,11 +71,11 @@ float CRandom::random_float() {
   return (float)*data;
 }
 
-void CRandom::seed(uint8_t seed) {
+void CRandom::seed(const uint8_t seed) {
   this->_seed.push_back(seed);
 }
 
-bool CRandom::can_generate(CRandomType type) {
+bool CRandom::can_generate(const CRandomType type) const {
   switch (type) {
     case CRandomType::INT:
       return this->_seed.size() >= 4;

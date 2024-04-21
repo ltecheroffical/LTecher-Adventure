@@ -22,14 +22,3 @@ For each new file, start it with this:
 
 ## Files
 To support as much compilers as possible, don't use `#pragma once` in header files.
-
-```cpp
-/*
- * LTecher Adventure (c) 2024
- *
- * This file belongs to the LTecher Adventure project
- */
-
-```
-
-This is used for identification purposes.

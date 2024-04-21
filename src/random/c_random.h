@@ -1,9 +1,3 @@
-/*
- * LTecher Adventure (c) 2024
- *
- * This file belongs to the LTecher Adventure project
- */
-
 #include <vector>
 
 #include "irandom_generator.h"
@@ -40,19 +34,19 @@ public:
    *
    * @returns True if the random number generator will generate new numbers
    */
-  bool can_generate(CRandomType type);
+  bool can_generate(const CRandomType type) const;
 
   /*
    * Seeds the random number generator
    *
    * @param seed The seed to use
    */
-  void seed(uint8_t seed);
+  void seed(const uint8_t seed);
 
   /*
    * Gets the seed of the random number generator
    */
-  inline int get_seed_count() { return _seed.size(); };
+  inline int get_seed_count() const { return _seed.size(); };
 
 private:
   /*

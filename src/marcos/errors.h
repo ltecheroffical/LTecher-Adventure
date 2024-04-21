@@ -5,6 +5,9 @@
  */
 
 #include <iostream>
+#include <cstdlib>
+
+#include <marcos/exit_codes.h> // You also get exit codes too :)
 
 #include <tinyfiledialogs.h>
 
@@ -22,6 +25,6 @@
                                 "error", \
                                 1 \
                               ); \
-                              exit(exit_code);
+                              std::exit(exit_code);
 
 #endif
