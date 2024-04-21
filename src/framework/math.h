@@ -16,4 +16,20 @@ inline Vec2 vec2_normalize(Vec2 v) {
   }
   return v;
 };
+
+inline Vec2 vec2_add(Vec2 a, Vec2 b) {
+  return { a.x + b.x, a.y + b.y };;
+}
+
+inline Vec2 vec2_sub(Vec2 a, Vec2 b) {
+  return { a.x - b.x, a.y - b.y };
+}
+
+inline Vec2 vec2_mul(Vec2 a, Vec2 b) {
+  return { a.x * b.x, a.y * b.y };
+}
+
+inline Vec2 vec2_div(Vec2 a, Vec2 b) {
+  return { a.x / b.x, a.y / b.y };
+}
 #endif 

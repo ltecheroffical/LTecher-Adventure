@@ -14,12 +14,14 @@ friend class Scene;
 public:
   virtual ~GameObject() = default;
    
-  float get_x() { return _position.x; };
-  float get_y() { return _position.y; };
+  float get_x() { return position.x; };
+  float get_y() { return position.y; };
 
 protected:
-  Vec2 _position = {0.0f, 0.0f};
-  Vec2 _scale = {1.0f, 1.0f}; 
+  Vec2 position = {0.0f, 0.0f};
+  Vec2 scale = {1.0f, 1.0f};
+
+  unsigned int render_priority = 0;
 
   virtual void init() { /* empty */ };
   virtual void late_init() { /* empty */ };

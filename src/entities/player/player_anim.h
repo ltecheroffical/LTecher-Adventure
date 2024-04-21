@@ -13,11 +13,13 @@ public:
   ~PlayerAnim();
 
   void update(const float delta) override;
-  void player_destroy();
 
 private:
   Player *_player;
 
   float _anim_timer = 0.0f;
+
+  bool _move_alternate = false;
+  uint8_t _anim_offset = 0;
 };
 #endif

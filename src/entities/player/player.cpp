@@ -42,8 +42,8 @@ Player::~Player() {
 }
 
 void Player::init() {
-  this->_position = { 0.0f, 0.0f };
-  this->_scale = { 5.5f, 5.0f };
+  this->position = { 0.0f, 0.0f };
+  this->scale = { 5.5f, 5.0f };
 
   this->_state = PlayerState::PLAYER_STATE_IDLE;
 
@@ -54,7 +54,6 @@ void Player::init() {
 
 void Player::destroy() {
   App::singleton()->get_scene()->remove_child(player_anim_child_id);
-  this->_anim.get()->player_destroy();
   player_anim_child_id = 0;
 }
 
@@ -68,9 +67,9 @@ void Player::render(SDL_Renderer *renderer) {
   SDL_FRect dst_rect;
 
   src_rect = {(float)this->_anim_frame * 16, 0, 16, 16};
-  dst_rect = {this->_position.x - App::camera().x,
-              this->_position.y - App::camera().y,
-              this->_scale.x * 16, this->_scale.y * 16};
+  dst_rect = {this->position.x - App::camera().x,
+              this->position.y - App::camera().y,
+              this->scale.x * 16, this->scale.y * 16};
   SDL_RenderTexture(
     renderer,
     this->_texture_player_atlas.texture, 
@@ -103,7 +102,7 @@ void Player::update_movement(const float delta) {
     this->_move_direction = direction;
   }
   
-  this->_position.x += direction.x * SPEED * delta;
-  this->_position.y += direction.y * SPEED * delta;
+  this->position.x += direction.x * SPEED * delta;
+  this->position.y += direction.y * SPEED * delta;
 }
 
