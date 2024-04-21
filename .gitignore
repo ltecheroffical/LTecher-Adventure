@@ -2,6 +2,9 @@
 build_macos/*
 build_win32/*
 
+!build_macos/instructions.txt
+!build_win32/instructions.txt
+
 # Clangd
 .cache/
 
