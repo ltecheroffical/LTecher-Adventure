@@ -95,7 +95,7 @@ int App::run() {
     this->render(this->renderer);
     this->on_render.emit(this->renderer);
 
-    if (this->_max_fps_enabled) {
+    if (!(this->_flags & APP_FLAGS_NO_FPS_LIMIT)) {
       SDL_Delay(1000 / this->_max_fps);
     }
   }
@@ -133,18 +133,6 @@ void App::update(float delta) {
     for (auto child : this->_scene->_children) {
       child.second->update(delta);
     }
-  }
-
-  // Check if <C-f> is pressed
-  static bool ctrl_f_pressed = false;
-  if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_F] &&
-      SDL_GetKeyboardState(NULL)[SDL_SCANCODE_LCTRL]) {
-    if (!ctrl_f_pressed) {
-      this->_max_fps_enabled = !this->_max_fps_enabled;
-      ctrl_f_pressed = true;
-    }
-  } else {
-    ctrl_f_pressed = false;
   }
 }
 

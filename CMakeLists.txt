@@ -10,11 +10,18 @@ set(SDL_TEST_LIBRARY OFF)
 set(PNG_TESTS OFF)
 set(PNG_SHARED OFF)
 
+# Enet
+set(ENET_STATIC ON)
+set(ENET_SHARED OFF)
+
 # Shared libs
 set(BUILD_SHARED_LIBS OFF)
 
 # C++
 set(CMAKE_CXX_STANDARD 20)
+
+# Game build
+set(BUILD_GAME_SERVER ON CACHE BOOL "Build the game server")
 
 # Windows compability
 if (WIN32)
@@ -32,10 +39,11 @@ add_subdirectory(thirdparty/libpng)             # PNG loading library
 
 add_subdirectory(thirdparty/tinyfiledialogs)    # GUI dialogs
 
-# Sources
-file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+add_subdirectory(thirdparty/enet)               # Networking
 
-add_executable(${CMAKE_PROJECT_NAME} ${MY_SOURCES})
+file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+
+add_executable(${CMAKE_PROJECT_NAME} ${GAME_SOURCES})
 
 # Compilers
 message(STATUS "CMAKE_CXX_COMPILER_ID = ${CMAKE_CXX_COMPILER_ID}")
