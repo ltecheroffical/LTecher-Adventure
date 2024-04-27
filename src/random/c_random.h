@@ -18,7 +18,7 @@ enum class CRandomType {
  */
 class CRandom : public IRandomGenerator {
 public:
-  CRandom();
+  CRandom() = default;
   ~CRandom() = default;
 
   int random_int() override;
