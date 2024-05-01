@@ -13,6 +13,8 @@ public:
   ~PlayerAnim();
 
   void update(const float delta) override;
+  void handle_idle();
+  void handle_move();
 
 private:
   Player *_player;

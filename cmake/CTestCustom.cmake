@@ -1,0 +1,35 @@
+set(CTEST_CUSTOM_TESTS_IGNORE
+  # Ignore all libpng tests
+  pngtest
+  pngvalid-gamma-16-to-8
+  pngvalid-gamma-alpha-mode
+  pngvalid-gamma-background
+  pngvalid-gamma-expand16-alpha-mode
+  pngvalid-gamma-expand16-background
+  pngvalid-gamma-expand16-transform
+  pngvalid-gamma-sbit
+  pngvalid-gamma-threshold
+  pngvalid-gamma-transform
+  pngvalid-progressive-interlace-standard
+  pngvalid-progressive-size
+  pngvalid-progressive-standard
+  pngvalid-standard
+  pngvalid-transform
+  pngstest-1.8-none
+  pngstest-1.8-alpha
+  pngstest-linear-none
+  pngstest-linear-alpha
+  pngstest-none-none
+  pngstest-none-alpha
+  pngstest-sRGB-none
+  pngstest-sRGB-alpha
+  pngunknown-discard
+  pngunknown-IDAT
+  pngunknown-if-safe
+  pngunknown-sAPI
+  pngunknown-save
+  pngunknown-sTER
+  pngunknown-vpAg
+  pngimage-quick
+  pngimage-full
+)

@@ -6,17 +6,16 @@
 #ifndef KEYBINDS_H
 #define KEYBINDS_H
 
-typedef enum Keybind {
+using Keybind = enum class Keybind {
   PLAYER_UP,
   PLAYER_DOWN,
   PLAYER_LEFT,
   PLAYER_RIGHT
-} Keybind;
+};
 
 class Keybinds {
 public:
-  static Keybinds& singleton() {
-    static Keybinds instance;
+  static Keybinds& singleton() { 
     return instance;
   }
 
@@ -29,7 +28,7 @@ public:
    * @returns True if the keybind exists or false if it doesn't
    */
   bool get(const Keybind keybind, SDL_Scancode *scancode) const {
-    if (this->_keybinds.find(keybind) == this->_keybinds.end()) {
+    if (!this->_keybinds.contains(keybind)) {
       return false;
     }
     *scancode = this->_keybinds.at(keybind);
@@ -44,8 +43,7 @@ public:
    * @returns SDL_SCANCODE_UNKNOWN if the keybind doesn't exist or SDL_Scancode
    */
   SDL_Scancode get_or_null(const Keybind keybind) const {
-    SDL_Scancode scancode;
-    if (this->get(keybind, &scancode)) {
+    if (SDL_Scancode scancode; this->get(keybind, &scancode)) {
       return scancode;
     }
     return SDL_SCANCODE_UNKNOWN;
@@ -61,7 +59,7 @@ public:
    */
   bool bind(const Keybind keybind, const SDL_Scancode scancode) {
     // Does it exist already?
-    if (this->_keybinds.find(keybind) != this->_keybinds.end()) {
+    if (this->_keybinds.contains(keybind)) {
       // We can bind it
       this->_keybinds[keybind] = scancode;
     }
@@ -77,6 +75,8 @@ public:
 private:
   Keybinds();
   ~Keybinds() = default;
+
+  static Keybinds instance;
 
   std::map<Keybind, SDL_Scancode> _keybinds;
 };
