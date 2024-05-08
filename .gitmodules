@@ -13,6 +13,3 @@
 [submodule "thirdparty/SDL_mixer"]
 	path = thirdparty/SDL_mixer
 	url = https://github.com/libsdl-org/SDL_mixer
-[submodule "thirdparty/SDL_net"]
-	path = thirdparty/SDL_net
-	url = https://github.com/libsdl-org/SDL_net

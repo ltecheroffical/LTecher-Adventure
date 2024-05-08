@@ -1,7 +1,10 @@
+#include <format>
+
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
 
 #include <marcos/errors.h>
+#include <exceptions/app_exceptions.hpp>
 
 #include <scenes/scene_game.h>
 
@@ -12,8 +15,8 @@
 App *App::_app = nullptr;
 
 App::App() {
-  if (this->_app != nullptr) {
-    throw std::runtime_error("App already exists");
+  if (App::_app != nullptr) {
+    throw app::errors::already_exists("App already exists");
   }
 
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -24,31 +27,35 @@ App::App() {
     PANIC("Failed to initialize SDL_image", EXIT_MAJOR_ERROR);
   }
 
-  this->_app = this;
+  App::_app = this;
 }
 
 App::~App() {
-  this->_app = nullptr;
+  App::_app = nullptr;
   if (this->_running) {
-    this->exit();
+    try {
+      this->close();
+    } catch (app::errors::not_active &e) {
+      SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "%s", e.what());
+    }
   }
   SDL_Quit();
 }
 
 int App::run() {
   this->window = SDL_CreateWindow(
-    "LTecher-Adventure", 650, 350,
+    "LTecher Adventure", 650, 350,
     SDL_WINDOW_RESIZABLE
   );
 
-  if (this->window == NULL) {
+  if (this->window == nullptr) {
     SDL_Quit();
     PANIC("Failed to create window", EXIT_MAJOR_ERROR);
   }
 
-  this->renderer = SDL_CreateRenderer(this->window, NULL, 0);
+  this->renderer = SDL_CreateRenderer(this->window, nullptr, 0);
 
-  if (this->renderer == NULL) {
+  if (this->renderer == nullptr) {
     SDL_DestroyWindow(this->window);
     SDL_Quit();
     PANIC("Failed to create renderer", EXIT_MAJOR_ERROR);
@@ -56,7 +63,8 @@ int App::run() {
 
   this->_running = true;
 
-  uint64_t now, last = 0;
+  uint64_t now  = 0;
+  uint64_t last = 0;
 
   this->set_scene(new SceneGame());
 
@@ -67,11 +75,23 @@ int App::run() {
     while (SDL_PollEvent(&event)) {
       this->on_event.emit(event);
       switch (event.type) {
-        case SDL_EVENT_QUIT:
-          this->exit();
+        case SDL_EVENT_QUIT: {
+          this->close();
           break;
-        default:
+        }
+        case SDL_EVENT_KEY_DOWN: {
+#if PRODUCTION_BUILD == 0
+          if (event.key.keysym.sym == SDLK_F1) {
+            this->_zoom += 0.1f;
+          } else if (event.key.keysym.sym == SDLK_F2) {
+            if (this->_zoom > 0.1) {
+              this->_zoom -= 0.1f;
+            }
+          }
+          SDL_SetRenderScale(this->renderer, this->_zoom, this->_zoom);
+#endif
           break;
+        }
       }
       this->on_event_post.emit(event);
     }
@@ -81,12 +101,10 @@ int App::run() {
     last = now;
     now = SDL_GetPerformanceCounter();
 
-    delta = (float)((now - last)*1000 / (float)SDL_GetPerformanceFrequency()) * 0.001f;
+    delta = ((float)(now - last)*1000 / (float)SDL_GetPerformanceFrequency()) * 0.001f;
 
-    static bool inital_frame = true;
-    if (inital_frame) {
+    if (last == 0) {
       delta = 0.0f;
-      inital_frame = false;
     }
 
     this->update(delta);
@@ -95,16 +113,16 @@ int App::run() {
     this->render(this->renderer);
     this->on_render.emit(this->renderer);
 
-    if (!(this->_flags & APP_FLAGS_NO_FPS_LIMIT)) {
+    if (!(this->_flags & (uint32_t)AppFlags::APP_FLAG_NO_FPS_LIMIT)) {
       SDL_Delay(1000 / this->_max_fps);
     }
   }
   return 0;
 }
 
-void App::exit() {
+void App::close() {
   if (!this->_running) {
-    throw std::runtime_error("App is not running");
+    throw app::errors::not_active("App is not running");
   }
   this->_running = false;
   this->on_exit.emit();
@@ -114,45 +132,61 @@ void App::exit() {
 }
 
 void App::update(float delta) {
-#if PRODUCTION_BUILD == 0
-  this->_debug_window_title = "LTecher Adventure";
-  
-  this->_debug_window_title += " | FPS: " + std::to_string(
-    (int)(1.0f / delta)
-  );
+  if (this->_flags & (uint32_t)AppFlags::APP_FLAG_TITLE_INFO) {
+    constexpr auto default_window_title = "LTecher Adventure | FPS: {}"; 
+    this->_debug_window_title = std::format(
+        default_window_title,
 
-  if (this->_scene == nullptr) {
-    this->_debug_window_title += " | No scene";
+        (int)(1.0f / delta));
+    if (this->_scene == nullptr) {
+      this->_debug_window_title += " | No scene";
+    }
+
+    SDL_SetWindowTitle(this->window, this->_debug_window_title.c_str());
   }
-
-  SDL_SetWindowTitle(this->window, this->_debug_window_title.c_str());
-#endif
 
   if (this->_scene != nullptr) {
     // Update all the children
-    for (auto child : this->_scene->_children) {
-      child.second->update(delta);
+    for (auto [_, child] : this->_scene->_children) {
+      child->update(delta);
     }
   }
 }
 
-void App::render(SDL_Renderer *renderer) {
+void App::render(SDL_Renderer *sdl_renderer) {
   if (this->_scene != nullptr) {
-    SDL_SetRenderDrawColor(renderer,
+    SDL_SetRenderDrawColor(sdl_renderer,
       this->_scene->_background_color.r,
       this->_scene->_background_color.g,
       this->_scene->_background_color.b, 0xFF);
-    SDL_RenderClear(renderer);
+    SDL_RenderClear(sdl_renderer);
 
-    for (auto child : this->_scene->_children) {
-      child.second->render(renderer);
+    std::vector<unsigned int> render_ids;
+    std::vector<GameObject *> render_objects;
+    
+    // Render everything with the ID as the render piority
+    for (auto [id, child] : this->_scene->_children) {
+      render_ids.push_back(id);
+      render_objects.push_back(child);
+    }
+
+    // Sort the objects based on ID
+    std::ranges::sort(render_objects, [&render_ids, &render_objects](GameObject *a, GameObject *b) {
+        unsigned int object_a_index = std::ranges::find(render_objects, a) - render_objects.begin();
+        unsigned int object_b_index = std::ranges::find(render_objects, b) - render_objects.begin();
+
+        return render_ids[object_a_index] > render_ids[object_b_index];
+    });
+
+    for (auto object : render_objects) {
+      object->render(this->renderer);
     }
     
     SDL_RenderPresent(renderer);
   } else {
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
-    SDL_RenderPresent(renderer);
+    SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, 255);
+    SDL_RenderClear(sdl_renderer);
+    SDL_RenderPresent(sdl_renderer);
   }
 }
 
@@ -166,10 +200,10 @@ void App::set_scene(Scene *scene) {
 
 Vec2 App::camera() {
   if (App::singleton() == nullptr) {
-    throw std::runtime_error("App not initialized");
+    throw app::errors::not_active("App not initialized");
   }  
   if (App::singleton()->_scene == nullptr) {
-    throw std::runtime_error("No scene");
+    throw app::errors::not_active("No scene");
   }
   return App::singleton()->_scene->camera;
 }
