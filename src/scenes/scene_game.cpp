@@ -1,22 +1,20 @@
+#include <memory>
+
 #include <framework/minigameobject.h>
 
-#include <entities/player/player.h>
+#include <save/game_save.h>
 
 #include "scene_game.h"
 
 
-SceneGame::SceneGame() : Scene() {
-  
-}
-
-SceneGame::~SceneGame() {
-  
-}
-
 void SceneGame::init() {
-  this->_background_color = {0x00, 0xFF, 0xFF, 0xFF};
+  this->_background_color = {0, 255, 255, 255};
   
-  auto gameobject_player = new Player();
+  this->_gameobject_world = std::make_unique<World>();
+  this->_gameobject_player = std::make_unique<Player>();
 
-  this->add_child(gameobject_player, 1);
+  this->_gameobject_world->generate_world(5);
+
+  this->add_child(this->_gameobject_world.get(), 0);
+  this->add_child(this->_gameobject_player.get(), 1);
 }

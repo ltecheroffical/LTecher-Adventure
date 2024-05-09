@@ -1,5 +1,3 @@
-#include <memory>
-
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
 
@@ -10,18 +8,16 @@
 #ifndef ENTITY_PLAYER_H
 #define ENTITY_PLAYER_H
 
-class PlayerAnim;
-
-typedef enum PlayerState {
+using PlayerState = enum class PlayerState {
   PLAYER_STATE_IDLE,
   PLAYER_STATE_WALKING
-} PlayerState;
+};
 
 class Player : public GameObject {
 friend class PlayerAnim;
 public:
   Player();
-  ~Player();
+  ~Player() override = default;
 
   PlayerState get_state() const { return this->_state; };
   inline Vec2 get_walk_direction() const { return this->_move_direction; };
@@ -30,16 +26,17 @@ private:
   void init() override;
   void update(const float delta) override;
   void render(SDL_Renderer *renderer) override;
-  void destroy() override;
 
   PlayerState _state = PlayerState::PLAYER_STATE_IDLE;
 
   Vec2 _move_direction = { 0.0f, 0.0f };
 
   void update_movement(const float delta);
+  void update_camera(const float delta);
+  void update_anim(const float delta);
 
-  std::unique_ptr<PlayerAnim> _anim;
-  int _anim_frame = 0;
+  uint8_t _anim_frame = 0;
+  float   _anim_timer = 0.0f;
 
   static SDL_ImageData _texture_player_atlas;
 };

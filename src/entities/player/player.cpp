@@ -5,40 +5,39 @@
 #include <keybinds.h>
 #include <app.h>
 
-#include "player_anim.h"
 #include "player.h"
 
 
 SDL_ImageData Player::_texture_player_atlas;
 
-int player_anim_child_id = 0;
+float lerp(float a, float b, float t) {
+  return a + (b - a) * t;
+}
 
 Player::Player() {
   static bool assets_loaded = false;
 
   if (!assets_loaded) {
-    this->_texture_player_atlas = { 0 };
-
-    this->_texture_player_atlas.texture = IMG_LoadTexture(
+    Player::_texture_player_atlas.texture = IMG_LoadTexture(
       App::singleton()->renderer, RESOURCES "images/entities/player.png");
 
-    if (this->_texture_player_atlas.texture == NULL) {
+    if (Player::_texture_player_atlas.texture == nullptr) {
       PANIC("Failed to load player texture", EXIT_FAILURE);
     }
 
     SDL_QueryTexture(
-      this->_texture_player_atlas.texture, NULL, NULL,
-      &this->_texture_player_atlas.width,
-      &this->_texture_player_atlas.height);
+      Player::_texture_player_atlas.texture, nullptr, nullptr,
+      &Player::_texture_player_atlas.width,
+      &Player::_texture_player_atlas.height);
 
-    SDL_SetTextureScaleMode(this->_texture_player_atlas.texture, SDL_SCALEMODE_NEAREST);
+    SDL_SetTextureScaleMode(Player::_texture_player_atlas.texture, SDL_SCALEMODE_NEAREST);
+
+    App::singleton()->on_exit.subscribe([]() {
+      SDL_DestroyTexture(Player::_texture_player_atlas.texture);
+    });
 
     assets_loaded = true;
   }
-}
-
-Player::~Player() {
-  
 }
 
 void Player::init() {
@@ -47,18 +46,13 @@ void Player::init() {
 
   this->_state = PlayerState::PLAYER_STATE_IDLE;
 
-  this->_anim = std::make_unique<PlayerAnim>(this);
-  player_anim_child_id = App::singleton()->get_scene()->add_child(
-    this->_anim.get(), Scene::OBJ_ID_NULL);
-}
-
-void Player::destroy() {
-  App::singleton()->get_scene()->remove_child(player_anim_child_id);
-  player_anim_child_id = 0;
 }
 
 void Player::update(const float delta) {
   this->update_movement(delta);
+  this->update_camera(delta);
+
+  this->update_anim(delta);
 }
 
 void Player::render(SDL_Renderer *renderer) {
@@ -72,7 +66,7 @@ void Player::render(SDL_Renderer *renderer) {
               this->scale.x * 16, this->scale.y * 16};
   SDL_RenderTexture(
     renderer,
-    this->_texture_player_atlas.texture, 
+    Player::_texture_player_atlas.texture, 
     &src_rect, &dst_rect
   );
 }
@@ -82,8 +76,8 @@ void Player::update_movement(const float delta) {
   
   Vec2 direction = { 0.0f, 0.0f };
 
-  Keybinds &keybinds = Keybinds::singleton();
-  const Uint8 *keys = SDL_GetKeyboardState(NULL);
+  const Keybinds &keybinds = Keybinds::singleton();
+  const Uint8 *keys = SDL_GetKeyboardState(nullptr);
 
   bool left_pressed = keys[keybinds.get_or_null(Keybind::PLAYER_LEFT)];
   bool right_pressed = keys[keybinds.get_or_null(Keybind::PLAYER_RIGHT)];
@@ -96,13 +90,44 @@ void Player::update_movement(const float delta) {
   direction = vec2_normalize(direction);
 
   if (direction.x == 0.0f && direction.y == 0.0f) {
-    this->_state = PLAYER_STATE_IDLE;
+    this->_state = PlayerState::PLAYER_STATE_IDLE;
   } else {
     this->_state = PlayerState::PLAYER_STATE_WALKING;
     this->_move_direction = direction;
   }
-  
+ 
+#if PRODUCTION_BUILD == 0
+  if (keys[SDL_SCANCODE_R]) {
+    direction.x *= 4;
+    direction.y *= 4;
+  }
+#endif
+
   this->position.x += direction.x * SPEED * delta;
   this->position.y += direction.y * SPEED * delta;
 }
 
+void Player::update_camera(const float delta) {
+  float camera_position_x = this->position.x;
+  float camera_position_y = this->position.y;
+  
+  // Get window size
+  int window_width;
+  int window_height;
+
+  SDL_GetWindowSize(App::singleton()->window, &window_width, &window_height);
+
+  
+  camera_position_x -= (float)window_width / 2;
+  camera_position_y -= (float)window_height / 2;
+  
+  camera_position_x += (this->scale.x * 16.0f) / 2.0f;
+  camera_position_y += (this->scale.y * 16.0f) / 2.0f;
+
+
+  float *current_camera_x = &App::singleton()->get_scene()->camera.x;
+  float *current_camera_y = &App::singleton()->get_scene()->camera.y;
+
+  *current_camera_x = lerp(*current_camera_x, camera_position_x, delta * 1.5f);
+  *current_camera_y = lerp(*current_camera_y, camera_position_y, delta * 1.5f);
+}

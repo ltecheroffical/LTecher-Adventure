@@ -130,6 +130,7 @@ private:
 #endif
 
   uint32_t _flags = 0;
+  float _zoom = 1;
 
   Scene *_scene = nullptr;
 };

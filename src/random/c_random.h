@@ -11,7 +11,7 @@ enum class CRandomType {
   CHAR
 };
 
-#define SEED_COUNT_CONSIDERED_LOW 6
+const uint8_t SEED_COUNT_CONSIDERED_LOW = 6;
 
 /*
  * Generates random numbers using the C stdlib
@@ -19,7 +19,7 @@ enum class CRandomType {
 class CRandom : public IRandomGenerator {
 public:
   CRandom() = default;
-  ~CRandom() = default;
+  ~CRandom() override = default;
 
   int random_int() override;
   float random_float() override;

@@ -14,13 +14,10 @@ friend class Scene;
 public:
   virtual ~GameObject() = default;
    
-  float get_x() { return position.x; };
-  float get_y() { return position.y; };
-
-protected:
   Vec2 position = {0.0f, 0.0f};
   Vec2 scale = {1.0f, 1.0f};
 
+protected:
   unsigned int render_priority = 0;
 
   virtual void init() { /* empty */ };

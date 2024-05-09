@@ -1,4 +1,5 @@
 #include <format>
+#include <thread>
 
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
@@ -83,12 +84,13 @@ int App::run() {
 #if PRODUCTION_BUILD == 0
           if (event.key.keysym.sym == SDLK_F1) {
             this->_zoom += 0.1f;
+            SDL_SetRenderScale(this->renderer, this->_zoom, this->_zoom);
           } else if (event.key.keysym.sym == SDLK_F2) {
             if (this->_zoom > 0.1) {
               this->_zoom -= 0.1f;
+              SDL_SetRenderScale(this->renderer, this->_zoom, this->_zoom);
             }
           }
-          SDL_SetRenderScale(this->renderer, this->_zoom, this->_zoom);
 #endif
           break;
         }
@@ -145,6 +147,7 @@ void App::update(float delta) {
     SDL_SetWindowTitle(this->window, this->_debug_window_title.c_str());
   }
 
+  std::vector<std::thread> update_threads;
   if (this->_scene != nullptr) {
     // Update all the children
     for (auto [_, child] : this->_scene->_children) {
