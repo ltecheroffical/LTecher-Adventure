@@ -12,9 +12,6 @@
 
 SDL_ImageData Player::_texture_player_atlas;
 
-float lerp(float a, float b, float t) {
-  return a + (b - a) * t;
-}
 
 Player::Player() {
   static bool assets_loaded = false;
@@ -138,6 +135,6 @@ void Player::update_camera(const float delta) {
   float *current_camera_x = &App::singleton()->get_scene()->camera.x;
   float *current_camera_y = &App::singleton()->get_scene()->camera.y;
 
-  *current_camera_x = lerp(*current_camera_x, camera_position_x, delta * 1.5f);
-  *current_camera_y = lerp(*current_camera_y, camera_position_y, delta * 1.5f);
+  *current_camera_x = std::lerp(*current_camera_x, camera_position_x, delta * 1.5f);
+  *current_camera_y = std::lerp(*current_camera_y, camera_position_y, delta * 1.5f);
 }

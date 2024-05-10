@@ -1,6 +1,7 @@
 # CMake
 build_macos/*
 build_win32/*
+Testing/
 
 !build_macos/instructions.txt
 !build_win32/instructions.txt
@@ -29,3 +30,5 @@ run_project.sh
 
 # Game generated
 imgui.ini
+TODO.txt
+save.txt

@@ -125,12 +125,12 @@ private:
   void update(float delta);
   void render(SDL_Renderer *renderer);
 
-#if PRODUCTION_BUILD == 0
-  std::string _debug_window_title = "LTecher Adventure";
-#endif
+  std::string _info_window_title = "LTecher Adventure";
 
   uint32_t _flags = 0;
+#if PRODUCTION_BUILD == 0
   float _zoom = 1;
+#endif
 
   Scene *_scene = nullptr;
 };

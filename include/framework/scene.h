@@ -28,7 +28,7 @@ public:
       return id;
     } else {
       // Some random ID
-      int generated_id = rand() % UINT_MAX;
+      int generated_id = rand();
       this->_children[generated_id] = child;
       return generated_id;
     }

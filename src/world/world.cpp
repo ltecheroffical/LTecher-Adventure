@@ -104,7 +104,7 @@ void World::update(const float delta) {
   const uint16_t CHUNK_GEN_DISTANCE_Y = screen_height / 150.0f;
 
   // Iterate over the surrounding chunks of the camera
-  for (int x = camera_chunk_x - CHUNK_GEN_DISTANCE_X; x <= camera_chunk_x + CHUNK_GEN_DISTANCE_X; x) {
+  for (int x = camera_chunk_x - CHUNK_GEN_DISTANCE_X; x <= camera_chunk_x + CHUNK_GEN_DISTANCE_X; ++x) {
     for (int y = camera_chunk_y - CHUNK_GEN_DISTANCE_Y; y <= camera_chunk_y + CHUNK_GEN_DISTANCE_Y; ++y) {
       // Check if the chunk at (x, y) exists in the world
       screen_width += CAMERA_SIZE_INCREASE_X;
@@ -163,7 +163,7 @@ void World::update(const float delta) {
 void World::render(SDL_Renderer *renderer) {
   uint8_t chunk[16 * 16] = { 0 };
 
-  for (int i = 0; i < this->_world_data.size(); ++i) {
+  for (int i = 0; i < (int)this->_world_data.size(); ++i) {
     int chunk_x = this->_world_data[i].x;
     int chunk_y = this->_world_data[i].y;
 
@@ -218,11 +218,11 @@ void World::render_imgui() {
 #if PRODUCTION_BUILD == 0
   ImGui::Begin("World");
 
-  ImGui::Text("Chunk count: %lu", this->_world_data.size());
+  ImGui::Text("Chunk count: %lu", (long unsigned int)this->_world_data.size());
 
   // Display all chunks
   if (ImGui::BeginListBox("Chunks")) {
-    for (int i = 0; i < this->_world_data.size(); ++i) {
+    for (int i = 0; i < (int)this->_world_data.size(); ++i) {
       std::string chunk_string = "";
       int chunk_x = this->_world_data[i].x;
       int chunk_y = this->_world_data[i].y;

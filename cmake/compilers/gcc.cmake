@@ -13,7 +13,11 @@ if (MINGW)
   )
 endif()
 
+if (WIN32)
+  target_link_options(${CMAKE_PROJECT_NAME} PRIVATE
+    -mwindows)
+endif()
+
 target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE
   -Wall
-  -Werror
 )

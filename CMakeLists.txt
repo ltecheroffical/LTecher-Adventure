@@ -6,13 +6,17 @@ set(SDL_STATIC ON)
 set(SDL_SHARED OFF)
 set(SDL_TEST_LIBRARY OFF)
 
+set(SDL3MIXER_OPUS_SHARED OFF)
+
+set(SDL3IMAGE_WEBP_SHARED OFF)
+set(SDL3IMAGE_TIF_SHARED OFF)
+
+set(SDL3IMAGE_WEBP OFF)
+set(SDL3IMAGE_TIF OFF)
+
 # PNG
 set(PNG_TESTS OFF)
 set(PNG_SHARED OFF)
-
-# Enet
-set(ENET_STATIC ON)
-set(ENET_SHARED OFF)
 
 # Shared libs
 set(BUILD_SHARED_LIBS OFF)
@@ -33,13 +37,11 @@ add_subdirectory(thirdparty/SDL)                # Rendering library
 add_subdirectory(thirdparty/SDL_image)          # Image loading library
 add_subdirectory(thirdparty/SDL_mixer)          # Audio loading library
 add_subdirectory(thirdparty/SDL_ttf)            # Font loading library
-add_subdirectory(thirdparty/SDL_net)            # Networking library
 
 add_subdirectory(thirdparty/libpng)             # PNG loading library
 
 add_subdirectory(thirdparty/tinyfiledialogs)    # GUI dialogs
-
-add_subdirectory(thirdparty/enet)               # Networking
+add_subdirectory(thirdparty/imgui)              # Debug GUI
 
 file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
@@ -97,23 +99,23 @@ target_include_directories("${CMAKE_PROJECT_NAME}" PRIVATE
 add_dependencies("${CMAKE_PROJECT_NAME}"
   SDL3-static
   SDL3_image-static
-  SDL3_mixer-static
-  SDL3_net-static
-  SDL3_ttf-static
+  #SDL3_mixer-static
+  #SDL3_ttf-static
 
   png_static
 
+  imgui
   tinyfiledialogs
 )
 
 target_link_libraries("${CMAKE_PROJECT_NAME}"
   SDL3-static
   SDL3_image-static
-  SDL3_mixer-static
-  SDL3_net-static
-  SDL3_ttf-static
+  #SDL3_mixer-static
+  #SDL3_ttf-static
 
   png_static
 
+  imgui
   tinyfiledialogs
 )

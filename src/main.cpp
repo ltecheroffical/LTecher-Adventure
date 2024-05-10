@@ -40,3 +40,9 @@ int main(int argc, char** argv) {
   app.set_flags(flags);
   return app.run();
 }
+
+#ifdef WIN32
+int WinMain() {
+  return main(__argc, __argv);
+}
+#endif

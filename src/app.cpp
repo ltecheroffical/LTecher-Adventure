@@ -23,7 +23,7 @@ App::App() {
     throw app::errors::already_exists("App already exists");
   }
 
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMEPAD) != 0) {
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD) != 0) {
     PANIC("Failed to initialize SDL", EXIT_MAJOR_ERROR);
   }
 
@@ -154,15 +154,15 @@ void App::close() {
 void App::update(float delta) {
   if (this->_flags & (uint32_t)AppFlags::APP_FLAG_TITLE_INFO) {
     constexpr auto default_window_title = "LTecher Adventure | FPS: {}"; 
-    this->_debug_window_title = std::format(
+    this->_info_window_title = std::format(
         default_window_title,
 
         (int)(1.0f / delta));
     if (this->_scene == nullptr) {
-      this->_debug_window_title += " | No scene";
+      this->_info_window_title += " | No scene";
     }
 
-    SDL_SetWindowTitle(this->window, this->_debug_window_title.c_str());
+    SDL_SetWindowTitle(this->window, this->_info_window_title.c_str());
   }
 
   if (this->_scene != nullptr) {
@@ -197,11 +197,11 @@ void App::render(SDL_Renderer *sdl_renderer) {
     }
 
     // Sort the objects based on ID
-    std::ranges::sort(render_objects, [&render_ids, &render_objects](GameObject *a, GameObject *b) {
-        unsigned int object_a_index = std::ranges::find(render_objects, a) - render_objects.begin();
-        unsigned int object_b_index = std::ranges::find(render_objects, b) - render_objects.begin();
+    std::sort(render_objects.begin(), render_objects.end(), [&render_ids, &render_objects](GameObject *a, GameObject *b) {
+      unsigned int object_a_index = std::ranges::find(render_objects, a) - render_objects.begin();
+      unsigned int object_b_index = std::ranges::find(render_objects, b) - render_objects.begin();
 
-        return render_ids[object_a_index] > render_ids[object_b_index];
+      return render_ids[object_a_index] > render_ids[object_b_index];
     });
 
     for (auto object : render_objects) {
