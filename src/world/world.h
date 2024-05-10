@@ -1,5 +1,7 @@
 #include <vector>
 
+#include <lib/FastNoiseLite.h>
+
 #include <framework/sdl_data.h>
 #include <framework/gameobject.h>
 
@@ -29,6 +31,8 @@ public:
 private:
   std::vector<Chunk> _world_data;
 
+  FastNoiseLite noise;
+
   int _world_seed = 0;
 
 #if PRODUCTION_BUILD == 0
@@ -36,7 +40,7 @@ private:
   unsigned int _selected_block = 0;
 #endif
 
-  void generate_chunk(int x, int y, int seed);
+  void generate_chunk(int x, int y);
 
   void render_chunk(SDL_Renderer *renderer, int x, int y);
 

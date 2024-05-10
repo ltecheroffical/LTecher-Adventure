@@ -6,11 +6,12 @@
 
 #include <imgui.h>
 
-#include <lib/FastNoiseLite.h>
-
 #include <app.h>
 
 #include "world.h"
+
+unsigned int CAMERA_SIZE_INCREASE_X = 238;
+unsigned int CAMERA_SIZE_INCREASE_Y = 238;
 
 SDL_Image World::_texture_map_atlas;
 
@@ -39,13 +40,18 @@ World::World() {
                      &World::_texture_map_atlas.width,
                      &World::_texture_map_atlas.height);
   }
+ 
+  this->noise.SetFractalOctaves(3);
+  this->noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+
 }
 
-void World::generate_world(int seed) { 
-  for (int8_t x = -2; x < 2; x++) {
+void World::generate_world(int seed) {
+  this->noise.SetSeed(seed);
+  for (int8_t x = -2; x < 2; ++x) {
     float percentage = 0;
-    for (int8_t y = -2; y < 2; y++) {
-      this->generate_chunk(x, y, seed);
+    for (int8_t y = -2; y < 2; ++y) {
+      this->generate_chunk(x, y);
 
       percentage = (float)(x + y) / (16 * 2);
       percentage = percentage * 100;
@@ -57,21 +63,15 @@ void World::generate_world(int seed) {
   this->_world_seed = seed;
 }
 
-void World::generate_chunk(int world_x, int world_y, int seed) {
-  FastNoiseLite noise;
-
-  noise.SetSeed(seed);
-  noise.SetFractalOctaves(3);
-  noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
-
+void World::generate_chunk(int world_x, int world_y) { 
   uint8_t chunk_data[16 * 16] = { 0 };   
 
   const uint8_t MAX_TILES = 2;
 
-  for (int8_t x = 0; x < 16; x++) {
-    for (int8_t y = 0; y < 16; y++) {
+  for (int8_t x = 0; x < 16; ++x) {
+    for (int8_t y = 0; y < 16; ++y) {
       // Perlin noise between 0 and 1
-      float noise_data = noise.GetNoise((float)(x + world_x * 16), (float)(y + world_y * 16));
+      float noise_data = this->noise.GetNoise((float)(x + world_x * 16), (float)(y + world_y * 16));
       uint8_t map_data = 0;
 
       map_data = std::clamp(roundf(noise_data * MAX_TILES), 0.0f, (float)MAX_TILES - 1.0f);
@@ -99,33 +99,53 @@ void World::update(const float delta) {
   int screen_width, screen_height = 0;
   SDL_GetWindowSize(App::singleton()->window, &screen_width, &screen_height);
 
-  const uint16_t chunk_gen_distance = (screen_width + screen_height) / 200.0f;
+  
+  const uint16_t CHUNK_GEN_DISTANCE_X = screen_width / 210.0f;
+  const uint16_t CHUNK_GEN_DISTANCE_Y = screen_height / 150.0f;
 
   // Iterate over the surrounding chunks of the camera
-  for (int x = camera_chunk_x - chunk_gen_distance; x <= camera_chunk_x + chunk_gen_distance; x++) {
-    for (int y = camera_chunk_y - chunk_gen_distance; y <= camera_chunk_y + chunk_gen_distance; y++) {
+  for (int x = camera_chunk_x - CHUNK_GEN_DISTANCE_X; x <= camera_chunk_x + CHUNK_GEN_DISTANCE_X; x) {
+    for (int y = camera_chunk_y - CHUNK_GEN_DISTANCE_Y; y <= camera_chunk_y + CHUNK_GEN_DISTANCE_Y; ++y) {
       // Check if the chunk at (x, y) exists in the world
+      screen_width += CAMERA_SIZE_INCREASE_X;
+      screen_height += CAMERA_SIZE_INCREASE_Y;
+
+      unsigned int chunk_x_world = x * (16 * 16);
+      unsigned int chunk_y_world = y * (16 * 16);
+
+      unsigned int camera_x_offsetted = App::camera().x - CAMERA_SIZE_INCREASE_X;
+      unsigned int camera_y_offsetted = App::camera().y - CAMERA_SIZE_INCREASE_Y;
+
+      if (!is_intersecting(camera_x_offsetted, camera_y_offsetted, screen_width, screen_height, chunk_x_world, chunk_y_world, 16, 16)) {
+        continue;
+      }
+
       if (!has_chunk(x, y)) {
-        // Generate the chunk if it doesn't exist
-        generate_chunk(x, y, this->_world_seed);
+        // Generate the chunk
+        generate_chunk(x, y);
       }
     }
   }
 
   // Let's test each chunk to see if we are using them
-  for (size_t i = 0; i < this->_world_data.size(); i++) {
+  for (size_t i = 0; i < this->_world_data.size(); ++i) {
     int chunk_x = this->_world_data[i].x;
     int chunk_y = this->_world_data[i].y;
 
-    int screen_width = 0;
-    int screen_height = 0;
-    SDL_GetWindowSize(App::singleton()->window, &screen_width, &screen_height);
-   
-    screen_width += 800;
-    screen_height += 800;
+    int screen_width, screen_height = 0;
+    SDL_GetWindowSize(App::singleton()->window, &screen_width, &screen_height); 
 
-    if (is_intersecting(App::camera().x - 800, App::camera().y - 800, screen_width, screen_height,
-                         chunk_x * (16 * 16), chunk_y * (16 * 16), 16, 16)) {
+    screen_width += CAMERA_SIZE_INCREASE_X;
+    screen_height += CAMERA_SIZE_INCREASE_Y;
+
+    unsigned int chunk_x_world = chunk_x * (16 * 16);
+    unsigned int chunk_y_world = chunk_y * (16 * 16);
+
+
+    unsigned int camera_x_offsetted = App::camera().x - CAMERA_SIZE_INCREASE_X;
+    unsigned int camera_y_offsetted = App::camera().y - CAMERA_SIZE_INCREASE_Y;
+
+    if (is_intersecting(camera_x_offsetted, camera_y_offsetted, screen_width, screen_height, chunk_x_world, chunk_y_world, 16, 16)) {
       continue;
     }
 
@@ -134,6 +154,8 @@ void World::update(const float delta) {
       // Let's keep this chunk
       continue;
     }
+
+    // Delete it now
     this->_world_data.erase(this->_world_data.begin() + i);
   }
 }
@@ -141,7 +163,7 @@ void World::update(const float delta) {
 void World::render(SDL_Renderer *renderer) {
   uint8_t chunk[16 * 16] = { 0 };
 
-  for (int i = 0; i < this->_world_data.size(); i++) {
+  for (int i = 0; i < this->_world_data.size(); ++i) {
     int chunk_x = this->_world_data[i].x;
     int chunk_y = this->_world_data[i].y;
 
@@ -149,29 +171,29 @@ void World::render(SDL_Renderer *renderer) {
 
     // Are we intersecting with the camera?
 
-    int screen_width = 0;
-    int screen_height = 0;
+    int screen_width, screen_height = 0;
     SDL_GetWindowSize(App::singleton()->window, &screen_width, &screen_height);
    
-    screen_width += 800;
-    screen_height += 800;
 
-    if (!is_intersecting(App::camera().x - 800, App::camera().y - 800, screen_width, screen_height,
+    screen_width += CAMERA_SIZE_INCREASE_X;
+    screen_height += CAMERA_SIZE_INCREASE_Y;
+
+    if (!is_intersecting(App::camera().x - CAMERA_SIZE_INCREASE_X, App::camera().y - CAMERA_SIZE_INCREASE_Y, screen_width, screen_height,
                          chunk_x * (16 * 16), chunk_y * (16 * 16), 16, 16)) {
       continue;
     }
 
-    for (uint8_t x = 0; x < 16; x++) {
-      for (uint8_t y = 0; y < 16; y++) {
+    for (uint8_t x = 0; x < 16; ++x) {
+      for (uint8_t y = 0; y < 16; ++y) {
         SDL_FRect src_rect;
         SDL_FRect dst_rect;
 
         uint8_t tile_pos_x = 0;
         uint8_t tile_pos_y = chunk[x + y * 16];
         
-        while (tile_pos_y > World::_texture_map_atlas.height) {
-          tile_pos_y--;
-          tile_pos_x++;
+        if (tile_pos_y > World::_texture_map_atlas.height) {
+            tile_pos_x += (tile_pos_y - World::_texture_map_atlas.height);
+            tile_pos_y = World::_texture_map_atlas.height;
         }
         
         src_rect = { (float)tile_pos_x * 16, (float)tile_pos_y * 16, 16, 14 };
@@ -200,7 +222,7 @@ void World::render_imgui() {
 
   // Display all chunks
   if (ImGui::BeginListBox("Chunks")) {
-    for (int i = 0; i < this->_world_data.size(); i++) {
+    for (int i = 0; i < this->_world_data.size(); ++i) {
       std::string chunk_string = "";
       int chunk_x = this->_world_data[i].x;
       int chunk_y = this->_world_data[i].y;
@@ -233,8 +255,8 @@ void World::render_imgui() {
     ImGui::Checkbox("Chunk modified", &this->_world_data[chunk_index].is_modified);
     
     if (ImGui::BeginListBox("Tiles")) {
-      for (uint8_t x = 0; x < 16; x++) {
-        for (uint8_t y = 0; y < 16; y++) {
+      for (uint8_t x = 0; x < 16; ++x) {
+        for (uint8_t y = 0; y < 16; ++y) {
           std::string tile_string;
 
           tile_string += "(";
