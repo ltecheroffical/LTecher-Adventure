@@ -1,5 +1,7 @@
 #include <SDL3/SDL.h>
 
+#include <imgui.h>
+
 #include <marcos/errors.h>
 
 #include <keybinds.h>
@@ -69,6 +71,14 @@ void Player::render(SDL_Renderer *renderer) {
     Player::_texture_player_atlas.texture, 
     &src_rect, &dst_rect
   );
+
+#if PRODUCTION_BUILD == 0
+  ImGui::Begin("Player");
+
+  ImGui::InputFloat2("Position", &this->position.x);
+
+  ImGui::End();
+#endif
 }
 
 void Player::update_movement(const float delta) {

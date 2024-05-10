@@ -1,7 +1,10 @@
 #include <algorithm>
+#include <string>
 
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
+
+#include <imgui.h>
 
 #include <lib/FastNoiseLite.h>
 
@@ -81,6 +84,7 @@ void World::generate_chunk(int world_x, int world_y, int seed) {
   
   chunk.x = world_x;
   chunk.y = world_y;
+  chunk.is_modified = false;
 
   memcpy(&chunk.data, chunk_data, 16 * 16);
   this->_world_data.push_back(chunk);
@@ -125,6 +129,11 @@ void World::update(const float delta) {
       continue;
     }
 
+    // The chunk is not visible
+    if (this->_world_data[i].is_modified) {
+      // Let's keep this chunk
+      continue;
+    }
     this->_world_data.erase(this->_world_data.begin() + i);
   }
 }
@@ -132,7 +141,7 @@ void World::update(const float delta) {
 void World::render(SDL_Renderer *renderer) {
   uint8_t chunk[16 * 16] = { 0 };
 
-  for (size_t i = 0; i < this->_world_data.size(); i++) {
+  for (int i = 0; i < this->_world_data.size(); i++) {
     int chunk_x = this->_world_data[i].x;
     int chunk_y = this->_world_data[i].y;
 
@@ -178,6 +187,88 @@ void World::render(SDL_Renderer *renderer) {
       }
     }
   }
+  
+  // Let's render the chunk info
+  this->render_imgui();
+}
+
+void World::render_imgui() {
+#if PRODUCTION_BUILD == 0
+  ImGui::Begin("World");
+
+  ImGui::Text("Chunk count: %lu", this->_world_data.size());
+
+  // Display all chunks
+  if (ImGui::BeginListBox("Chunks")) {
+    for (int i = 0; i < this->_world_data.size(); i++) {
+      std::string chunk_string = "";
+      int chunk_x = this->_world_data[i].x;
+      int chunk_y = this->_world_data[i].y;
+      
+      chunk_string = "Chunk ";
+      chunk_string += std::to_string(i + 1);
+      chunk_string += " ";
+      
+      chunk_string += "(";
+      chunk_string += std::to_string(chunk_x * (16 * 16));
+      chunk_string += ", ";
+      chunk_string += std::to_string(chunk_y * (16 * 16));
+      chunk_string += ")";
+      
+      ImGui::Selectable(chunk_string.c_str());
+    }
+    ImGui::EndListBox();
+  }
+  ImGui::InputInt("Selected Chunk", (int*)&this->_selected_chunk);
+  this->_selected_chunk = std::clamp(
+      (int)this->_selected_chunk, 0, (int)this->_world_data.size());
+  ImGui::End();
+
+  if (this->_selected_chunk != 0) {
+    ImGui::Begin("Chunk");
+
+    unsigned int chunk_index = this->_selected_chunk - 1;
+
+    ImGui::InputInt2("Chunk position (Chunk space)", &this->_world_data[chunk_index].x);
+    ImGui::Checkbox("Chunk modified", &this->_world_data[chunk_index].is_modified);
+    
+    if (ImGui::BeginListBox("Tiles")) {
+      for (uint8_t x = 0; x < 16; x++) {
+        for (uint8_t y = 0; y < 16; y++) {
+          std::string tile_string;
+
+          tile_string += "(";
+          tile_string += std::to_string(x + 1);
+          tile_string += ", ";
+          tile_string += std::to_string(y + 1);
+          tile_string += ")";
+
+          ImGui::Selectable(tile_string.c_str());
+        }
+      }
+
+      ImGui::EndListBox();
+    }
+
+    ImGui::InputInt("Selected Block", (int *)&this->_selected_block);
+    
+    this->_selected_block = std::clamp(
+      (int)this->_selected_block, 0, (16 * 16)
+    );
+
+    if (this->_selected_block != 0) {
+      unsigned int block_index = this->_selected_block - 1;
+      unsigned int block_data = this->_world_data[chunk_index].data[block_index];
+
+      ImGui::InputInt("Block type", (int *)&block_data);
+      block_data = std::clamp((int)block_data, 0, 255);      
+
+      this->_world_data[chunk_index].data[block_index] = block_data;
+    }
+
+    ImGui::End();
+  } 
+#endif
 }
 
 void World::destroy() {

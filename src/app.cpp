@@ -1,8 +1,11 @@
 #include <format>
-#include <thread>
 
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
+
+#include <imgui.h>
+#include <backends/imgui_impl_sdl3.h>
+#include <backends/imgui_impl_sdlrenderer3.h>
 
 #include <marcos/errors.h>
 #include <exceptions/app_exceptions.hpp>
@@ -20,7 +23,7 @@ App::App() {
     throw app::errors::already_exists("App already exists");
   }
 
-  if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMEPAD) != 0) {
     PANIC("Failed to initialize SDL", EXIT_MAJOR_ERROR);
   }
 
@@ -62,6 +65,13 @@ int App::run() {
     PANIC("Failed to create renderer", EXIT_MAJOR_ERROR);
   }
 
+  ImGui::CreateContext();
+  
+  ImGui::StyleColorsDark();
+
+  ImGui_ImplSDL3_InitForSDLRenderer(window, renderer);
+  ImGui_ImplSDLRenderer3_Init(renderer);
+
   this->_running = true;
 
   uint64_t now  = 0;
@@ -74,6 +84,7 @@ int App::run() {
   SDL_Event event;
   while (this->_running) {
     while (SDL_PollEvent(&event)) {
+      ImGui_ImplSDL3_ProcessEvent(&event);
       this->on_event.emit(event);
       switch (event.type) {
         case SDL_EVENT_QUIT: {
@@ -129,6 +140,13 @@ void App::close() {
   this->_running = false;
   this->on_exit.emit();
 
+  if (this->_scene != nullptr) {
+    for (auto [id, child] : this->_scene->_children) {
+      child->destroy();
+      this->_scene->remove_child(id);
+    }
+  }
+
   SDL_DestroyRenderer(this->renderer);
   SDL_DestroyWindow(this->window);
 }
@@ -147,26 +165,31 @@ void App::update(float delta) {
     SDL_SetWindowTitle(this->window, this->_debug_window_title.c_str());
   }
 
-  std::vector<std::thread> update_threads;
   if (this->_scene != nullptr) {
     // Update all the children
     for (auto [_, child] : this->_scene->_children) {
       child->update(delta);
     }
+    this->_scene->unload();
   }
 }
 
 void App::render(SDL_Renderer *sdl_renderer) {
+  ImGui_ImplSDLRenderer3_NewFrame();
+  ImGui_ImplSDL3_NewFrame();
+  ImGui::NewFrame();
+
   if (this->_scene != nullptr) {
     SDL_SetRenderDrawColor(sdl_renderer,
       this->_scene->_background_color.r,
       this->_scene->_background_color.g,
       this->_scene->_background_color.b, 0xFF);
+
     SDL_RenderClear(sdl_renderer);
 
     std::vector<unsigned int> render_ids;
     std::vector<GameObject *> render_objects;
-    
+   
     // Render everything with the ID as the render piority
     for (auto [id, child] : this->_scene->_children) {
       render_ids.push_back(id);
@@ -184,11 +207,15 @@ void App::render(SDL_Renderer *sdl_renderer) {
     for (auto object : render_objects) {
       object->render(this->renderer);
     }
-    
+   
+    ImGui::Render();
+    ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData());
     SDL_RenderPresent(renderer);
   } else {
+    ImGui::Render();
     SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, 255);
     SDL_RenderClear(sdl_renderer);
+    ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData());
     SDL_RenderPresent(sdl_renderer);
   }
 }

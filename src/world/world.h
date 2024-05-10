@@ -8,6 +8,7 @@
 
 typedef struct Chunk {
   int x, y;
+  bool is_modified;
   uint8_t data[16 * 16];
 } Chunk;
 
@@ -30,9 +31,16 @@ private:
 
   int _world_seed = 0;
 
+#if PRODUCTION_BUILD == 0
+  unsigned int _selected_chunk = 0;
+  unsigned int _selected_block = 0;
+#endif
+
   void generate_chunk(int x, int y, int seed);
 
   void render_chunk(SDL_Renderer *renderer, int x, int y);
+
+  void render_imgui();
 
 
   static SDL_Image _texture_map_atlas;
