@@ -1,6 +1,9 @@
 # LTecher Adventure
 LTecher Adventure is a WIP proceedially generated game made with C++ and raylib.
 
+## Archival
+This branch is only kept for legacy purposes. This branch is not maintained.
+
 ## Building
 
 ### Cloning the repo
