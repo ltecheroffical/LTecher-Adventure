@@ -1,4 +1,5 @@
 #include <format>
+#include <chrono>
 
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
@@ -23,7 +24,7 @@ App::App() {
     throw app::errors::already_exists("App already exists");
   }
 
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD) != 0) {
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD | SDL_INIT_TIMER) != 0) {
     PANIC("Failed to initialize SDL", EXIT_MAJOR_ERROR);
   }
 
@@ -52,14 +53,14 @@ int App::run() {
     SDL_WINDOW_RESIZABLE
   );
 
-  if (this->window == nullptr) {
+  if (this->window == NULL) {
     SDL_Quit();
     PANIC("Failed to create window", EXIT_MAJOR_ERROR);
   }
 
-  this->renderer = SDL_CreateRenderer(this->window, nullptr, 0);
+  this->renderer = SDL_CreateRenderer(this->window, NULL, 0);
 
-  if (this->renderer == nullptr) {
+  if (this->renderer == NULL) {
     SDL_DestroyWindow(this->window);
     SDL_Quit();
     PANIC("Failed to create renderer", EXIT_MAJOR_ERROR);
@@ -74,15 +75,16 @@ int App::run() {
 
   this->_running = true;
 
-  uint64_t now  = 0;
-  uint64_t last = 0;
+  long long now  = SDL_GetTicks();
+  long long last = SDL_GetTicks();
 
   this->set_scene(new SceneGame());
 
   Keybinds::singleton().reset();
-  
+
   SDL_Event event;
   while (this->_running) {
+    now = SDL_GetTicks();
     while (SDL_PollEvent(&event)) {
       ImGui_ImplSDL3_ProcessEvent(&event);
       this->on_event.emit(event);
@@ -109,16 +111,11 @@ int App::run() {
       this->on_event_post.emit(event);
     }
 
-    float delta = 0.0f;
-
-    last = now;
-    now = SDL_GetPerformanceCounter();
-
-    delta = ((float)(now - last)*1000 / (float)SDL_GetPerformanceFrequency()) * 0.001f;
-
-    if (last == 0) {
-      delta = 0.0f;
+    float delta = (now - last) * 0.001f;
+    if (!(this->_flags & (uint32_t)AppFlags::APP_FLAG_NO_FPS_LIMIT) && (delta * 1000) < 1000.0f / this->_max_fps) {
+      continue;
     }
+
 
     this->update(delta);
     this->on_update.emit(delta);
@@ -126,9 +123,8 @@ int App::run() {
     this->render(this->renderer);
     this->on_render.emit(this->renderer);
 
-    if (!(this->_flags & (uint32_t)AppFlags::APP_FLAG_NO_FPS_LIMIT)) {
-      SDL_Delay(1000 / this->_max_fps);
-    }
+    last = SDL_GetTicks();
+    delta = 0.0f;
   }
   return 0;
 }
