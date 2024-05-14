@@ -75,16 +75,17 @@ int App::run() {
 
   this->_running = true;
 
-  long long now  = SDL_GetTicks();
-  long long last = SDL_GetTicks();
+  long long a = SDL_GetTicks();
+  long long b = SDL_GetTicks();
 
   this->set_scene(new SceneGame());
 
   Keybinds::singleton().reset();
 
+  float delta = 0;
   SDL_Event event;
   while (this->_running) {
-    now = SDL_GetTicks();
+    a = SDL_GetTicks();
     while (SDL_PollEvent(&event)) {
       ImGui_ImplSDL3_ProcessEvent(&event);
       this->on_event.emit(event);
@@ -111,11 +112,14 @@ int App::run() {
       this->on_event_post.emit(event);
     }
 
-    float delta = (now - last) * 0.001f;
-    if (!(this->_flags & (uint32_t)AppFlags::APP_FLAG_NO_FPS_LIMIT) && (delta * 1000) < 1000.0f / this->_max_fps) {
-      continue;
+    delta = (a - b) * 0.001f;
+    if (!(this->_flags & (uint32_t)AppFlags::APP_FLAG_NO_FPS_LIMIT)) {
+      if ((delta * 1000) < 1000.0f / this->_max_fps) {
+        continue;
+      }
+    } else {
+      b = SDL_GetTicks();
     }
-
 
     this->update(delta);
     this->on_update.emit(delta);
@@ -123,7 +127,9 @@ int App::run() {
     this->render(this->renderer);
     this->on_render.emit(this->renderer);
 
-    last = SDL_GetTicks();
+    if (!(this->_flags & (uint32_t)AppFlags::APP_FLAG_NO_FPS_LIMIT)) {
+      b = SDL_GetTicks();
+    }
     delta = 0.0f;
   }
   return 0;
