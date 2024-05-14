@@ -4,7 +4,7 @@
 
 #include "c_random.h"
 
-bool CRandom::try_get_seed(uint8_t *seed) {
+bool CRandom::try_get_seed(char *seed) {
   // If the seed vector is empty, return false
   if (this->_seed.empty()) {
     return false;
@@ -17,7 +17,7 @@ bool CRandom::try_get_seed(uint8_t *seed) {
 
 int CRandom::random_int() {
   int data;
-  uint8_t seed;
+  char seed;
   
   // Generate 4 bytes of random data and add each byte to data
   for (int i = 0; i < 4; i++) {
@@ -35,7 +35,7 @@ int CRandom::random_int() {
 
 char CRandom::random_char() {
   char data;
-  uint8_t seed;
+  char seed;
   
   // Generate 1 byte of random data 
   if (this->try_get_seed(&seed)) {
@@ -50,7 +50,7 @@ char CRandom::random_char() {
 
 float CRandom::random_float() {
   float data;
-  uint8_t seed;
+  char seed;
   
   // Generate 4 bytes of random data and add each byte to data
   for (int i = 0; i < 4; i++) {
@@ -67,7 +67,7 @@ float CRandom::random_float() {
   return data;
 }
 
-void CRandom::seed(const uint8_t seed) {
+void CRandom::seed(const char seed) {
   this->_seed.push_back(seed);
 }
 

@@ -1,4 +1,3 @@
-#include <stdint.h>
 #include <stddef.h>
 
 #ifndef UTIL_HASH_H
@@ -15,7 +14,7 @@ extern "C" {
  *
  * @return The crc32 hash of the string
  */
-uint32_t crc32(const char *data, const size_t size);
+unsigned int crc32(const char *data, const size_t size);
 #ifdef __cplusplus
 }
 #endif

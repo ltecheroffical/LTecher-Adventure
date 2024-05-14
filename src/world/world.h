@@ -11,7 +11,7 @@
 typedef struct Chunk {
   int x, y;
   bool is_modified;
-  uint8_t data[16 * 16];
+  char data[16 * 16];
 } Chunk;
 
 class World : public GameObject {

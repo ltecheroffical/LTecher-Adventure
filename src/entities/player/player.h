@@ -35,8 +35,8 @@ private:
   void update_camera(const float delta);
   void update_anim(const float delta);
 
-  uint8_t _anim_frame = 0;
-  float   _anim_timer = 0.0f;
+  char  _anim_frame = 0;
+  float _anim_timer = 0.0f;
 
   static SDL_ImageData _texture_player_atlas;
 };

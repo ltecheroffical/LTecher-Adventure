@@ -11,7 +11,7 @@ public:
   GameSave(std::string save_file);
   ~GameSave() = default;
 
-  inline static const uint16_t SAVE_VERSION = 1;
+  inline static const short SAVE_VERSION = 1;
 
   /*
    * Saves the save file

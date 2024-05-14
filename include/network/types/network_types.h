@@ -4,7 +4,7 @@
 #define NETWORK_TYPES_H
 
 typedef struct NetworkedPlayer {
-  uint32_t id;
+  unsigned int id;
 
   char name[64];
 

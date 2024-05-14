@@ -11,9 +11,9 @@
 const char HEADER[4] = {'L', 'T', 'S', 'A'};
 
 
-const uint8_t FLAG_ONE_LIFE     = 1;
-const uint8_t FLAG_MODDED       = 2;
-const uint8_t FLAG_SERVER_SAVE  = 4;
+const char FLAG_ONE_LIFE     = 1;
+const char FLAG_MODDED       = 2;
+const char FLAG_SERVER_SAVE  = 4;
 
 
 GameSave::GameSave(std::string save_file) : _save_file(save_file) {
@@ -28,9 +28,9 @@ bool GameSave::save() {
   data.insert(
     data.end(),
     reinterpret_cast<const char*>(&SAVE_VERSION),
-    reinterpret_cast<const char*>(&SAVE_VERSION) + sizeof(uint16_t));
+    reinterpret_cast<const char*>(&SAVE_VERSION) + sizeof(unsigned short));
 
-  uint8_t flags = 0;
+  char flags = 0;
 
   if (this->flag_one_life) {
     flags |= FLAG_ONE_LIFE;
@@ -44,18 +44,18 @@ bool GameSave::save() {
 
   data.insert(data.end(), &flags, &flags + 1);
 
-  uint64_t save_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+  long long save_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
   data.insert(
     data.end(),
     reinterpret_cast<const char*>(&save_time),
-    reinterpret_cast<const char*>(&save_time) + sizeof(uint64_t));
+    reinterpret_cast<const char*>(&save_time) + sizeof(unsigned long long));
 
-  uint32_t player_count = this->_players.size();
+  unsigned int player_count = this->_players.size();
   data.insert(
     data.end(),
     reinterpret_cast<const char*>(&player_count),
-    reinterpret_cast<const char*>(&player_count) + sizeof(uint32_t));
+    reinterpret_cast<const char*>(&player_count) + sizeof(unsigned int));
 
   
   for ([[maybe_unused]] auto player : this->_players) {

@@ -1,5 +1,4 @@
 #include <format>
-#include <chrono>
 
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
@@ -113,7 +112,7 @@ int App::run() {
     }
 
     delta = (a - b) * 0.001f;
-    if (!(this->_flags & (uint32_t)AppFlags::APP_FLAG_NO_FPS_LIMIT)) {
+    if (!(this->_flags & (char)AppFlags::APP_FLAG_NO_FPS_LIMIT)) {
       if ((delta * 1000) < 1000.0f / this->_max_fps) {
         continue;
       }
@@ -127,7 +126,7 @@ int App::run() {
     this->render(this->renderer);
     this->on_render.emit(this->renderer);
 
-    if (!(this->_flags & (uint32_t)AppFlags::APP_FLAG_NO_FPS_LIMIT)) {
+    if (!(this->_flags & (char)AppFlags::APP_FLAG_NO_FPS_LIMIT)) {
       b = SDL_GetTicks();
     }
     delta = 0.0f;
@@ -153,7 +152,7 @@ void App::close() {
 }
 
 void App::update(float delta) {
-  if (this->_flags & (uint32_t)AppFlags::APP_FLAG_TITLE_INFO) {
+  if (this->_flags & (char)AppFlags::APP_FLAG_TITLE_INFO) {
     constexpr auto default_window_title = "LTecher Adventure | FPS: {}"; 
     this->_info_window_title = std::format(
         default_window_title,

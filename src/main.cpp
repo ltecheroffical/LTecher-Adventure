@@ -14,7 +14,7 @@ constexpr auto help_message() {
 }
 
 int main(int argc, char** argv) {
-  uint32_t flags = 0;
+  char flags = 0;
 
   if (argc > 0) {
     for (int i = 1; i < argc; i++) {
@@ -24,9 +24,9 @@ int main(int argc, char** argv) {
         std::cout << std::format(help_message(), argv[0]) << std::endl;
         return 0;
       } else if (arg == "--no-max-fps") {
-        flags += (uint32_t)AppFlags::APP_FLAG_NO_FPS_LIMIT;
+        flags += (char)AppFlags::APP_FLAG_NO_FPS_LIMIT;
       } else if (arg == "--title-info") {
-        flags += (uint32_t)AppFlags::APP_FLAG_TITLE_INFO;
+        flags += (char)AppFlags::APP_FLAG_TITLE_INFO;
       } else {
         std::cout << "Unknown argument: " << arg << std::endl;
 

@@ -48,31 +48,24 @@ World::World() {
 
 void World::generate_world(int seed) {
   this->noise.SetSeed(seed);
-  for (int8_t x = -2; x < 2; ++x) {
-    float percentage = 0;
-    for (int8_t y = -2; y < 2; ++y) {
+  for (char x = -2; x < 2; ++x) {
+    for (char y = -2; y < 2; ++y) {
       this->generate_chunk(x, y);
-
-      percentage = (float)(x + y) / (16 * 2);
-      percentage = percentage * 100;
-    }
-    if ((int)percentage % 15 == 0) {
-      SDL_Log("WORLD GENERATION IS %i%% COMPLETE", (int)percentage);
     }
   }
   this->_world_seed = seed;
 }
 
 void World::generate_chunk(int world_x, int world_y) { 
-  uint8_t chunk_data[16 * 16] = { 0 };   
+  char chunk_data[16 * 16] = { 0 };   
 
-  const uint8_t MAX_TILES = 2;
+  const char MAX_TILES = 2;
 
-  for (int8_t x = 0; x < 16; ++x) {
-    for (int8_t y = 0; y < 16; ++y) {
+  for (char x = 0; x < 16; ++x) {
+    for (char y = 0; y < 16; ++y) {
       // Perlin noise between 0 and 1
       float noise_data = this->noise.GetNoise((float)(x + world_x * 16), (float)(y + world_y * 16));
-      uint8_t map_data = 0;
+      char map_data = 0;
 
       map_data = std::clamp(roundf(noise_data * MAX_TILES), 0.0f, (float)MAX_TILES - 1.0f);
 
@@ -100,8 +93,8 @@ void World::update(const float delta) {
   SDL_GetWindowSize(App::singleton()->window, &screen_width, &screen_height);
 
   
-  const uint16_t CHUNK_GEN_DISTANCE_X = screen_width / 210.0f;
-  const uint16_t CHUNK_GEN_DISTANCE_Y = screen_height / 150.0f;
+  const short CHUNK_GEN_DISTANCE_X = screen_width / 210.0f;
+  const short CHUNK_GEN_DISTANCE_Y = screen_height / 150.0f;
 
   // Iterate over the surrounding chunks of the camera
   for (int x = camera_chunk_x - CHUNK_GEN_DISTANCE_X; x <= camera_chunk_x + CHUNK_GEN_DISTANCE_X; ++x) {
@@ -162,7 +155,7 @@ void World::update(const float delta) {
 }
 
 void World::render(SDL_Renderer *renderer) {
-  uint8_t chunk[16 * 16] = { 0 };
+  char chunk[16 * 16] = { 0 };
 
   for (int i = 0; i < (int)this->_world_data.size(); ++i) {
     int chunk_x = this->_world_data[i].x;
@@ -184,13 +177,13 @@ void World::render(SDL_Renderer *renderer) {
       continue;
     }
 
-    for (uint8_t x = 0; x < 16; ++x) {
-      for (uint8_t y = 0; y < 16; ++y) {
+    for (char x = 0; x < 16; ++x) {
+      for (char y = 0; y < 16; ++y) {
         SDL_FRect src_rect;
         SDL_FRect dst_rect;
 
-        uint8_t tile_pos_x = 0;
-        uint8_t tile_pos_y = chunk[x + y * 16];
+        char tile_pos_x = 0;
+        char tile_pos_y = chunk[x + y * 16];
         
         if (tile_pos_y > World::_texture_map_atlas.height) {
             tile_pos_x += (tile_pos_y - World::_texture_map_atlas.height);
@@ -256,8 +249,8 @@ void World::render_imgui() {
     ImGui::Checkbox("Chunk modified", &this->_world_data[chunk_index].is_modified);
     
     if (ImGui::BeginListBox("Tiles")) {
-      for (uint8_t x = 0; x < 16; ++x) {
-        for (uint8_t y = 0; y < 16; ++y) {
+      for (char x = 0; x < 16; ++x) {
+        for (char y = 0; y < 16; ++y) {
           std::string tile_string;
 
           tile_string += "(";

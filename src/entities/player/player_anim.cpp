@@ -3,10 +3,10 @@
 /*
  * Player animation frames lists
  */
-const uint8_t PLAYER_UP = 4;
-const uint8_t PLAYER_DOWN = 2;
-const uint8_t PLAYER_LEFT = 6;
-const uint8_t PLAYER_RIGHT = 8;
+const char PLAYER_UP = 4;
+const char PLAYER_DOWN = 2;
+const char PLAYER_LEFT = 6;
+const char PLAYER_RIGHT = 8;
 
 int wrap(int value, const int min, const int max) {
   if (value < min) {
@@ -17,9 +17,9 @@ int wrap(int value, const int min, const int max) {
   return value;
 }
 
-void process_move_anim(uint8_t *anim_frame, const Vec2 direction) {
+void process_move_anim(char *anim_frame, const Vec2 direction) {
   static bool _move_alternate = false;
-  static uint8_t _anim_offset = 0;
+  static char _anim_offset = 0;
   
   /*
    * Is the player going in more than one direction?
@@ -32,18 +32,18 @@ void process_move_anim(uint8_t *anim_frame, const Vec2 direction) {
     if (_move_alternate) {
       if (direction.x > 0.0f) {
         *anim_frame += _anim_offset;
-        *anim_frame = (uint8_t)wrap(*anim_frame + 1, PLAYER_RIGHT, PLAYER_RIGHT+1);
+        *anim_frame = (char)wrap(*anim_frame + 1, PLAYER_RIGHT, PLAYER_RIGHT+1);
       } else if (direction.x < 0.0f) {
         *anim_frame += _anim_offset;
-        *anim_frame = (uint8_t)wrap(*anim_frame + 1, PLAYER_LEFT, PLAYER_LEFT+1); 
+        *anim_frame = (char)wrap(*anim_frame + 1, PLAYER_LEFT, PLAYER_LEFT+1); 
       } 
     } else if (!_move_alternate) {
       if (direction.y > 0.0f) {
         *anim_frame += _anim_offset;
-        *anim_frame = (uint8_t)wrap(*anim_frame + 1, PLAYER_DOWN, PLAYER_DOWN+1);
+        *anim_frame = (char)wrap(*anim_frame + 1, PLAYER_DOWN, PLAYER_DOWN+1);
       } else if (direction.y < 0.0f) {
         *anim_frame += _anim_offset;
-        *anim_frame = (uint8_t)wrap(*anim_frame + 1, PLAYER_UP, PLAYER_UP+1);
+        *anim_frame = (char)wrap(*anim_frame + 1, PLAYER_UP, PLAYER_UP+1);
       }
     }
     
@@ -55,13 +55,13 @@ void process_move_anim(uint8_t *anim_frame, const Vec2 direction) {
      * So just change the animation frame to the direction
      */
     if (direction.x > 0.0f) {
-      *anim_frame = (uint8_t)wrap(*anim_frame + 1, PLAYER_RIGHT, PLAYER_RIGHT+1);
+      *anim_frame = (char)wrap(*anim_frame + 1, PLAYER_RIGHT, PLAYER_RIGHT+1);
     } else if (direction.x < 0.0f) {
-      *anim_frame = (uint8_t)wrap(*anim_frame + 1, PLAYER_LEFT, PLAYER_LEFT+1); 
+      *anim_frame = (char)wrap(*anim_frame + 1, PLAYER_LEFT, PLAYER_LEFT+1); 
     } else if (direction.y > 0.0f) {
-      *anim_frame = (uint8_t)wrap(*anim_frame + 1, PLAYER_DOWN, PLAYER_DOWN+1);
+      *anim_frame = (char)wrap(*anim_frame + 1, PLAYER_DOWN, PLAYER_DOWN+1);
     } else if (direction.y < 0.0f) {
-      *anim_frame = (uint8_t)wrap(*anim_frame + 1, PLAYER_UP, PLAYER_UP+1);
+      *anim_frame = (char)wrap(*anim_frame + 1, PLAYER_UP, PLAYER_UP+1);
     }
 
     // Also reset the move values

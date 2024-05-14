@@ -76,7 +76,7 @@ public:
    *
    * @param flags The flags to set
    */
-  inline void set_flags(uint32_t flags) { this->_flags = flags; };
+  inline void set_flags(char flags) { this->_flags = flags; };
 
 
   /*
@@ -127,7 +127,7 @@ private:
 
   std::string _info_window_title = "LTecher Adventure";
 
-  uint32_t _flags = 0;
+  char _flags = 0;
 #if PRODUCTION_BUILD == 0
   float _zoom = 1;
 #endif

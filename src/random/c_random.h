@@ -11,7 +11,7 @@ enum class CRandomType {
   CHAR
 };
 
-const uint8_t SEED_COUNT_CONSIDERED_LOW = 6;
+const char SEED_COUNT_CONSIDERED_LOW = 6;
 
 /*
  * Generates random numbers using the C stdlib
@@ -41,7 +41,7 @@ public:
    *
    * @param seed The seed to use
    */
-  void seed(const uint8_t seed);
+  void seed(const char seed);
 
   /*
    * Gets the seed of the random number generator
@@ -52,8 +52,8 @@ private:
   /*
    * Why is it a vector? To have more than one seed!
    */
-   std::vector<uint8_t> _seed;
+   std::vector<char> _seed;
 
-   bool try_get_seed(uint8_t *seed);
+   bool try_get_seed(char *seed);
 };
 #endif

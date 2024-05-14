@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <errno.h>
 
-#include <network/packet_utils.h>
+#include <network/types/packet_types.h>
+
+#include "packet_utils.h"
 
 size_t packet_size(const PacketType type) {
   switch (type) {
@@ -21,7 +23,7 @@ size_t packet_size_bytes(const PacketType type) {
 
 char *packet_to_bytes(const PacketType type, const void *data) {
   char *packet = malloc(packet_size_bytes(type));
-  uint16_t offset = 0;
+  short offset = 0;
 
  
   memcpy(packet + offset, &type, sizeof(PacketType));
@@ -38,7 +40,7 @@ PacketType bytes_to_packet(const char *data, const size_t size, void *data_out) 
     return PACKET_NONE;
   }
 
-  uint16_t offset = 0;
+  short offset = 0;
 
   PacketType type;
   memcpy(&type, data + offset, sizeof(PacketType));
