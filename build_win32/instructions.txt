@@ -1,7 +1,0 @@
-Change into this directory and run:
-
-`cmake .. -DCMAKE_BUILD_TYPE=[Debug|Release] -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchain.cmake`
-`make -jx`
-
-Replacing `x` with the number of cores you want to use
-and /path/to/toolchain.cmake with the path to your toolchain file for macos.

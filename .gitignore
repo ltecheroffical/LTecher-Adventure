@@ -1,10 +1,29 @@
 # CMake
-build_macos/*
-build_win32/*
-Testing/
+build/debug/linux/*
+build/debug/win64/*
+build/debug/macos/*
 
-!build_macos/instructions.txt
-!build_win32/instructions.txt
+!build/debug/linux/.gitkeep
+!build/debug/win64/.gitkeep
+!build/debug/macos/.gitkeep
+
+build/release/linux/*
+build/release/win64/*
+build/release/macos/*
+
+!build/release/linux/.gitkeep
+!build/release/win64/.gitkeep
+!build/release/macos/.gitkeep
+
+build/release_info/linux/*
+build/release_info/win64/*
+build/release_info/macos/*
+
+!build/release_info/linux/.gitkeep
+!build/release_info/win64/.gitkeep
+!build/release_info/macos/.gitkeep
+
+Testing/
 
 # Clangd
 .cache/

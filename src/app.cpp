@@ -141,9 +141,8 @@ void App::close() {
   this->on_exit.emit();
 
   if (this->_scene != nullptr) {
-    for (auto [id, child] : this->_scene->_children) {
-      child->destroy();
-      this->_scene->remove_child(id);
+    while (this->_scene->_children.size() > 0) {
+      this->_scene->remove_child(this->_scene->_children.begin()->first);
     }
   }
 
