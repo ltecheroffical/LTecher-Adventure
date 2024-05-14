@@ -106,7 +106,9 @@ void World::update(const float delta) {
   // Iterate over the surrounding chunks of the camera
   for (int x = camera_chunk_x - CHUNK_GEN_DISTANCE_X; x <= camera_chunk_x + CHUNK_GEN_DISTANCE_X; ++x) {
     for (int y = camera_chunk_y - CHUNK_GEN_DISTANCE_Y; y <= camera_chunk_y + CHUNK_GEN_DISTANCE_Y; ++y) {
-      // Check if the chunk at (x, y) exists in the world
+      // Will the chunk get destroyed quickly after we create it?
+      SDL_GetWindowSize(App::singleton()->window, &screen_width, &screen_height); 
+     
       screen_width += CAMERA_SIZE_INCREASE_X;
       screen_height += CAMERA_SIZE_INCREASE_Y;
 
@@ -149,7 +151,6 @@ void World::update(const float delta) {
       continue;
     }
 
-    // The chunk is not visible
     if (this->_world_data[i].is_modified) {
       // Let's keep this chunk
       continue;
