@@ -19,9 +19,30 @@ public:
   World();
   ~World() = default;
 
+  /*
+   * Gets if a chunk exists
+   *
+   * @param x the x position of the chunk
+   * @param y the y position of the chunk
+   *
+   * @return true if the chunk exists
+   */
   bool has_chunk(int x, int y);
+  /*
+   * Gets a chunk
+   *
+   * @param x the x position of the chunk
+   * @param y the y position of the chunk
+   *
+   * @return the chunk
+   */
   Chunk *get_chunk(int x, int y);
 
+  /*
+   * Generates the world
+   *
+   * @param seed the seed
+   */
   void generate_world(int seed);
 
   void update(const float delta) override;
