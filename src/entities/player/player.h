@@ -4,9 +4,13 @@
 #include <framework/gameobject.h>
 #include <framework/sdl_data.h>
 
+#include <components/health.h>
+
 
 #ifndef ENTITY_PLAYER_H
 #define ENTITY_PLAYER_H
+
+const float PLAYER_DEATH_TIMER_MAX = 2.0f;
 
 using PlayerState = enum class PlayerState {
   PLAYER_STATE_IDLE,
@@ -26,6 +30,8 @@ private:
   void init() override;
   void update(const float delta) override;
   void render(SDL_Renderer *renderer) override;
+  
+  Health _health = { 250.0f, 250.0f };
 
   PlayerState _state = PlayerState::PLAYER_STATE_IDLE;
 
@@ -37,6 +43,9 @@ private:
 
   char  _anim_frame = 0;
   float _anim_timer = 0.0f;
+
+  float _player_death_timer = PLAYER_DEATH_TIMER_MAX;
+
 
   static SDL_ImageData _texture_player_atlas;
 };

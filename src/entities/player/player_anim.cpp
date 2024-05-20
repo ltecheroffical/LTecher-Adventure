@@ -32,18 +32,18 @@ void process_move_anim(char *anim_frame, const Vec2 direction) {
     if (_move_alternate) {
       if (direction.x > 0.0f) {
         *anim_frame += _anim_offset;
-        *anim_frame = (char)wrap(*anim_frame + 1, PLAYER_RIGHT, PLAYER_RIGHT+1);
+        *anim_frame = (char)wrap(*anim_frame + 1, PLAYER_RIGHT, PLAYER_RIGHT + 1);
       } else if (direction.x < 0.0f) {
         *anim_frame += _anim_offset;
-        *anim_frame = (char)wrap(*anim_frame + 1, PLAYER_LEFT, PLAYER_LEFT+1); 
+        *anim_frame = (char)wrap(*anim_frame + 1, PLAYER_LEFT, PLAYER_LEFT + 1); 
       } 
     } else if (!_move_alternate) {
       if (direction.y > 0.0f) {
         *anim_frame += _anim_offset;
-        *anim_frame = (char)wrap(*anim_frame + 1, PLAYER_DOWN, PLAYER_DOWN+1);
+        *anim_frame = (char)wrap(*anim_frame + 1, PLAYER_DOWN, PLAYER_DOWN + 1);
       } else if (direction.y < 0.0f) {
         *anim_frame += _anim_offset;
-        *anim_frame = (char)wrap(*anim_frame + 1, PLAYER_UP, PLAYER_UP+1);
+        *anim_frame = (char)wrap(*anim_frame + 1, PLAYER_UP, PLAYER_UP + 1);
       }
     }
     

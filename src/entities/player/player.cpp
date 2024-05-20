@@ -44,10 +44,19 @@ void Player::init() {
   this->scale = { 5.5f, 5.0f };
 
   this->_state = PlayerState::PLAYER_STATE_IDLE;
-
 }
 
 void Player::update(const float delta) {
+  if (this->_health.health >= 0.0f) {
+    if (this->_player_death_timer > 0) {
+      this->_anim_frame = 0; // Lock the player animation to idle frame 0
+      this->_player_death_timer -= delta;
+    } else {
+      App::singleton()->get_scene()->remove_child(this);
+    }
+    return;
+  }
+
   this->update_movement(delta);
   this->update_camera(delta);
 
@@ -55,7 +64,7 @@ void Player::update(const float delta) {
 }
 
 void Player::render(SDL_Renderer *renderer) {
-  // Render the player at the coords in this->_position
+  // Render the player at the coords in this->_position 
   SDL_FRect src_rect;
   SDL_FRect dst_rect;
 
@@ -63,6 +72,7 @@ void Player::render(SDL_Renderer *renderer) {
   dst_rect = {this->position.x - App::camera().x,
               this->position.y - App::camera().y,
               this->scale.x * 16, this->scale.y * 16};
+
   SDL_RenderTexture(
     renderer,
     Player::_texture_player_atlas.texture, 

@@ -16,6 +16,7 @@
 
 #include "app.h"
 
+
 App *App::_app = nullptr;
 
 App::App() {
@@ -167,10 +168,16 @@ void App::update(float delta) {
 
   if (this->_scene != nullptr) {
     // Update all the children
-    for (auto [_, child] : this->_scene->_children) {
-      child->update(delta);
-    }
-    this->_scene->unload();
+    auto it = this->_scene->_children.begin();
+    while (it != this->_scene->_children.end()) {
+      it->second->update(delta);
+      if (it->second == nullptr) {
+        // The map was modified so time
+        // to throw everything in the trash
+        break;
+      } 
+      it++;
+    } 
   }
 }
 

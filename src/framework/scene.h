@@ -45,6 +45,22 @@ public:
   }
 
   /*
+   * Remove a child from the scene
+   * @param child The child to remove
+   *
+   */
+  void remove_child(const GameObject *child) {
+    // Find the child in the map
+    for (auto it = this->_children.begin(); it != this->_children.end(); it++) {
+      if (it->second == child) {
+        this->remove_child(it->first);
+        return;
+      }
+    }
+  }
+
+
+  /*
    * Get a child from the scene
    * @param id The ID of the child
    * @returns A raw pointer to the child
