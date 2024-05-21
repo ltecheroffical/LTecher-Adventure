@@ -2,13 +2,14 @@
 #include <string>
 
 #include <entities/player/player.h>
+#include <save/data/player_data.h>
 
 #ifndef GAME_SAVE_H
 #define GAME_SAVE_H
 
 class GameSave {
 public:
-  GameSave(std::string save_file);
+  GameSave() = default;
   ~GameSave() = default;
 
   inline static const short SAVE_VERSION = 1;
@@ -18,13 +19,13 @@ public:
    *
    * @return true if the save was successful
    */
-  bool save();
+  bool save(std::string save_file);
   /*
    * Loads the save file
    *
    * @return true if the load was successful
    */
-  bool load();
+  bool load(char *buffer, size_t length);
 
   /*
    * Adds a player to the save
@@ -47,5 +48,6 @@ private:
   std::string _save_file;
 
   std::vector<Player*> _players;
+  std::vector<PlayerData> _saved_players;
 };
 #endif

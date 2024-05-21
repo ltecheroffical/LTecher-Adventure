@@ -23,6 +23,8 @@ public:
   Player();
   ~Player() override = default;
 
+  char name[32];
+
   PlayerState get_state() const { return this->_state; };
   inline Vec2 get_walk_direction() const { return this->_move_direction; };
 

@@ -90,6 +90,14 @@ if (APPLE)
   include(cmake/macos_bundle.cmake)
 endif()
 
+# Tests
+enable_testing()
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CTestCustom.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/CTestCustom.cmake"
+  COPYONLY)
+include(tests/tests.cmake)
+
 # Linking
 target_include_directories("${CMAKE_PROJECT_NAME}" PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}/include/"
